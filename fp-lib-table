@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name "Powerpole")(type "KiCad")(uri "${KIPRJMOD}/Connectors_Anderson.pretty")(options "")(descr ""))
+)
