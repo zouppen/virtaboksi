@@ -1,0 +1,3 @@
+[submodule "Connectors_Anderson.pretty"]
+	path = Connectors_Anderson.pretty
+	url = https://github.com/imuli/Connectors_Anderson.pretty.git
