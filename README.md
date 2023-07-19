@@ -3,6 +3,11 @@
 12/24V power switch with home/away switch for use with a solar charge
 controller.
 
+![3D model](docs/3d.avif)
+
+In the picture above the Powerpole connector colors are incorrect. Red
+is used for 24 volts and yellow for 12 volts, and black for the ground.
+
 ## License
 
 The firmware is free software: you can redistribute it and/or modify
