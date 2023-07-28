@@ -52,6 +52,7 @@
       (dielectric_constraints no)
     )
     (pad_to_mask_clearance 0)
+    (aux_axis_origin 157.5 40)
     (pcbplotparams
       (layerselection 0x0001000_fffffffe)
       (disableapertmacros false)
@@ -1233,6 +1234,8 @@
     (format (units 3) (units_format 1) (precision 4))
     (style (thickness 0.2) (arrow_length 1.27) (text_position_mode 2) (extension_height 0.58642) (extension_offset 0.5) keep_text_aligned)
   )
+  (target plus (at 107.6 40) (size 5) (width 0.1) (layer "Edge.Cuts") (tstamp 33f59470-fb35-4fdc-ad0a-9af1f1a3b744))
+  (target plus (at 107.2 40) (size 5) (width 0.1) (layer "Edge.Cuts") (tstamp c4599667-cc66-4afb-9eb0-786a61c9dec2))
 
   (segment (start 120.81 95) (end 120.805 94.995) (width 0.4) (layer "B.Cu") (net 2) (tstamp 30dd29f4-2f52-4578-82b4-c99e7b9d43e8))
   (segment (start 118.8 82) (end 118.8 83.825) (width 0.4) (layer "B.Cu") (net 2) (tstamp 52a62333-d268-42bc-9c54-14242c2892fb))
