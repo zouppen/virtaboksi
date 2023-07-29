@@ -120,6 +120,7 @@
       },
       "track_widths": [
         0.0,
+        0.3,
         0.4
       ],
       "via_dimensions": [
@@ -385,10 +386,10 @@
         "name": "Power",
         "nets": [
           "+BATT",
-          "/HOME 12V",
-          "/HOME 24V",
-          "/PRI 12V",
-          "/PRI 24V"
+          "HOME 12V",
+          "HOME 24V",
+          "PRI 12V",
+          "PRI 24V"
         ],
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
