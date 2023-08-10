@@ -24,11 +24,22 @@ static uint16_t ctrl_debounce = 500;
 void update_outputs(void);
 
 void update_outputs() {
-	// No interrupts during given period, refresh outputs
-	if (PORT(SW_OFF_PORT, IDR) &= SW_OFF_PIN) {
-		PORT(LED_PORT, ODR) |= LED_PIN;
+	bool sw_off = PORT(SW_OFF_PORT, IDR) &= SW_OFF_PIN;
+	bool sw_bat = PORT(SW_BAT_PORT, IDR) &= SW_BAT_PIN;
+	bool sw_home = PORT(SW_HOME_PORT, IDR) &= SW_HOME_PIN;
+
+	if (sw_off || sw_bat) {
+		// BAT bad or OFF state: all outputs off
+		PORT(CTRL_PRI_PORT, ODR) &= ~CTRL_PRI_PIN;
+		PORT(CTRL_HOME_PORT, ODR) &= ~CTRL_HOME_PIN;
+	} else if (sw_home) {
+		// Home: All outputs on
+		PORT(CTRL_PRI_PORT, ODR) |= CTRL_PRI_PIN;
+		PORT(CTRL_HOME_PORT, ODR) |= CTRL_HOME_PIN;
 	} else {
-		PORT(LED_PORT, ODR) &= ~LED_PIN;
+		// Away: PRI on
+		PORT(CTRL_PRI_PORT, ODR) |= CTRL_PRI_PIN;
+		PORT(CTRL_HOME_PORT, ODR) &= ~CTRL_HOME_PIN;
 	}
 }
 
