@@ -1,6 +1,6 @@
 ## Select one of these
-#DEVICE=stm8s003f3
-DEVICE=stm8s103f3
+DEVICE=stm8s003f3
+#DEVICE=stm8s103f3
 
 ## A directory for common include files
 COMMONDIR = ..

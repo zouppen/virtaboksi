@@ -22,7 +22,10 @@
 /* Register addresses */
 
 /* Clock */
-#define CLK_CKDIVR	*(volatile unsigned char *)0x50C6
+#define CLK_CKDIVR	*(volatile uint8_t *)0x50C6
+#define CLK_ICKR	*(volatile uint8_t *)0x50C0
+#define CLK_SWR		*(volatile uint8_t *)0x50C4
+#define CLK_SWCR	*(volatile uint8_t *)0x50C5
 
 /* GPIO */
 #define PA_ODR *(volatile unsigned char *)0x5000
@@ -282,6 +285,8 @@
 #define ADC_CR2_ALIGN (1 << 3)
 #define ADC_CR2_SCAN (1 << 1)
 
+#define EXTI_CR1 *(volatile uint8_t *)0x50A0
+#define EXTI_CR2 *(volatile uint8_t *)0x50A1
 
 /* Interrupt commands */
 #define enableInterrupts()    {__asm__("rim\n");}  /* enable interrupts */
@@ -299,6 +304,7 @@
 #define TIM3_OVR_UIF_IRQ 15
 #define ADC1_EOC_IRQ 22
 #define TIM4_OVR_UIF_IRQ 23
+#define EXTI3_IRQ 5
 /*
 Interrupts:
 
