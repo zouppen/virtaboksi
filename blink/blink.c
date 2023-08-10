@@ -3,18 +3,23 @@
 #include <stdbool.h>
 #include "stm8.h"
 
+// Pin configuration
+#define LED_PORT	PA
+#define LED_PIN         PIN3
+#define SW_OFF_PORT     PC
+#define SW_OFF_PIN      PIN7
+#define SW_BAT_PORT     PC
+#define SW_BAT_PIN      PIN6
+#define SW_HOME_PORT    PC
+#define SW_HOME_PIN     PIN5
+#define CTRL_HOME_PORT  PD
+#define CTRL_HOME_PIN   PIN2
+#define CTRL_PRI_PORT   PD
+#define CTRL_PRI_PIN    PIN3
 
-#define LED_PORT     PA
-#define LED_PIN      PIN3
-#define SW_OFF_PORT  PC
-#define SW_OFF_PIN   PIN7
-#define SW_BAT_PORT  PC
-#define SW_BAT_PIN   PIN6
-#define SW_HOME_PORT PC
-#define SW_HOME_PIN  PIN5
-
-// On bootup, do control immediately
-static uint16_t ctrl_debounce = 1;
+// On bootup, do control immediately, but not too immediately to avoid
+// oscillation in case of a boot loop.
+static uint16_t ctrl_debounce = 500;
 
 void update_outputs(void);
 
@@ -70,13 +75,21 @@ int main(void)
 	PORT(SW_HOME_PORT, CR1) |= SW_HOME_PIN;
 	PORT(SW_HOME_PORT, CR2) |= SW_HOME_PIN;
 
-	// Interrupts on rising/falling edge on PORTC
+	// MOSFET controls are push-pull
+	PORT(CTRL_PRI_PORT, DDR) |= CTRL_PRI_PIN;
+	PORT(CTRL_PRI_PORT, CR1) |= CTRL_PRI_PIN;
+
+	PORT(CTRL_HOME_PORT, DDR) |= CTRL_HOME_PIN;
+	PORT(CTRL_HOME_PORT, CR1) |= CTRL_HOME_PIN;	
+
+	// Interrupts on rising/falling edge on PORTC. TODO change
+	// this if inputs are somewhere else than PORTC
 	EXTI_CR1 |= 0x30;
 
 	// Timer configuration
-	// Prescaler register
-	TIM2_PSCR = 4; // 2MHz/2^4 = 125 kHz
-	// Set Counter Auto-Reload Registers - TIM2_ARR=125, 1 millisecond
+	// Prescaler register: 2MHz/2^4 = 125 kHz
+	TIM2_PSCR = 4; // 
+	// Counter Auto-Reload Registers. TIM2_ARR = 125, 1 millisecond
 	TIM2_ARRH = 0;
 	TIM2_ARRL = 125;
 	// Interrupt Enable Register, Update interrupt (UIE)
@@ -84,10 +97,12 @@ int main(void)
 	// Control Register 1, Counter ENable bit (CEN)
 	TIM2_CR1 |= TIM_CR1_CEN;
 
+	// Enabling interrupts should be the last part of
+	// initialization.
 	enableInterrupts();
 
-	while(1) {
-		// Stay on light sleep mode
+	// Stay in light sleep to keep timers going (unless halted in interrupt)
+	while (true) {
 		wfi();
 	}
 }
