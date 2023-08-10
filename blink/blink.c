@@ -13,40 +13,44 @@
 #define SW_HOME_PORT PC
 #define SW_HOME_PIN  PIN5
 
-static uint16_t off_debounce = 0;
+// On bootup, do control immediately
+static uint16_t ctrl_debounce = 1;
+
+void update_outputs(void);
+
+void update_outputs() {
+	// No interrupts during given period, refresh outputs
+	if (PORT(SW_OFF_PORT, IDR) &= SW_OFF_PIN) {
+		PORT(LED_PORT, ODR) |= LED_PIN;
+	} else {
+		PORT(LED_PORT, ODR) &= ~LED_PIN;
+	}
+}
 
 void debounce_start(void) __interrupt(EXTI3_IRQ) {
-	off_debounce = 10000;
+	ctrl_debounce = 1000;
 }
 
 void debounce_check(void) __interrupt(TIM2_OVR_UIF_IRQ) {
-	bool any_running = false;
-
-	// Hack
-	PORT(LED_PORT, ODR) ^= LED_PIN; // PB_ODR |= (1 << 5);
-	
-	if (off_debounce) {
-		if (!--off_debounce) {
-			// Reached zero, set to target state
-			if (PORT(SW_OFF_PORT, IDR) &= SW_OFF_PIN) {
-				PORT(LED_PORT, ODR) |= LED_PIN;
-			} else {
-				PORT(LED_PORT, ODR) &= ~LED_PIN;
-			}
-		} else {
-			any_running = true;
-		}	
-	}
-
 	// Clear Timer 2 Status Register 1 Update Interrupt Flag (UIF)
 	TIM2_SR1 &= ~TIM_SR1_UIF;
+	
+	// Blink the LED when in operation
+	PORT(LED_PORT, ODR) ^= LED_PIN;
 
-	if (!any_running) {
-		// All timers in idle, halt the whole CPU
-		halt();
+	if (ctrl_debounce) {
+		if (!--ctrl_debounce) {
+			// Indicator LED turns off
+			PORT(LED_PORT, ODR) &= ~LED_PIN;
+
+			// Update outputs and then halt the whole CPU
+			update_outputs();
+
+			// When done counting, halt the whole CPU
+			halt();
+		}
 	}
 }
-
 
 int main(void)
 {
