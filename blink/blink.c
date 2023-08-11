@@ -24,9 +24,9 @@ static uint16_t ctrl_debounce = 500;
 void update_outputs(void);
 
 void update_outputs() {
-	bool sw_off = PORT(SW_OFF_PORT, IDR) &= SW_OFF_PIN;
-	bool sw_bat = PORT(SW_BAT_PORT, IDR) &= SW_BAT_PIN;
-	bool sw_home = PORT(SW_HOME_PORT, IDR) &= SW_HOME_PIN;
+	bool sw_off = !(PORT(SW_OFF_PORT, IDR) &= SW_OFF_PIN);
+	bool sw_bat = !(PORT(SW_BAT_PORT, IDR) &= SW_BAT_PIN);
+	bool sw_home = !(PORT(SW_HOME_PORT, IDR) &= SW_HOME_PIN);
 
 	if (sw_off || sw_bat) {
 		// BAT bad or OFF state: all outputs off
@@ -72,26 +72,25 @@ int main(void)
 {
 	// Not changing clock speed, running on default of 2 MHz
 
-	// LED is output, push-pull
+	// As suggested in chapter 11.5 of RM0016, unused pins are set
+	// to pull-up state. We make them all pull-up first and then
+	// set outputs.
+	PORT(PA, CR1) = 0xFF;
+	PORT(PB, CR1) = 0xFF;
+	PORT(PC, CR1) = 0xFF;
+	PORT(PD, CR1) = 0xFF;
+	
+	// LED is push-pull output (CR1 already set)
 	PORT(LED_PORT, DDR) |= LED_PIN;
-	PORT(LED_PORT, CR1) |= LED_PIN;
 
-	// Switches are inputs with pull-ups and interrupts
-	PORT(SW_OFF_PORT, CR1) |= SW_OFF_PIN;
+	// Switches are inputs with interrupts and pull-up (CR1 already set)
 	PORT(SW_OFF_PORT, CR2) |= SW_OFF_PIN;
-	
-	PORT(SW_BAT_PORT, CR1) |= SW_BAT_PIN;
 	PORT(SW_BAT_PORT, CR2) |= SW_BAT_PIN;
-	
-	PORT(SW_HOME_PORT, CR1) |= SW_HOME_PIN;
 	PORT(SW_HOME_PORT, CR2) |= SW_HOME_PIN;
 
-	// MOSFET controls are push-pull
+	// MOSFET controls are push-pull outputs (CR1 already set)
 	PORT(CTRL_PRI_PORT, DDR) |= CTRL_PRI_PIN;
-	PORT(CTRL_PRI_PORT, CR1) |= CTRL_PRI_PIN;
-
 	PORT(CTRL_HOME_PORT, DDR) |= CTRL_HOME_PIN;
-	PORT(CTRL_HOME_PORT, CR1) |= CTRL_HOME_PIN;	
 
 	// Interrupts on rising/falling edge on PORTC. TODO change
 	// this if inputs are somewhere else than PORTC
