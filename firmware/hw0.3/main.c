@@ -4,16 +4,18 @@
 #include "stm8.h"
 
 // Pin configuration
-#define LED_PORT          PA
-#define LED_PIN           PIN3
+#define LED_PORT          PD
+#define LED_PIN           PIN4
 #define SW_OFF_PORT       PC
-#define SW_OFF_PIN        PIN7
+#define SW_OFF_PIN        PIN5
 #define SW_BAT_PORT       PC
-#define SW_BAT_PIN        PIN6
+#define SW_BAT_PIN        PIN4
 #define SW_HOME_PORT      PC
-#define SW_HOME_PIN       PIN5
-#define CTRL_HOME_PORT    PD
-#define CTRL_HOME_PIN     PIN2
+#define SW_HOME_PIN       PIN3
+#define CTRL_HOME24_PORT  PD
+#define CTRL_HOME24_PIN   PIN2
+#define CTRL_HOME12_PORT  PC
+#define CTRL_HOME12_PIN   PIN7
 #define CTRL_PRI_PORT     PD
 #define CTRL_PRI_PIN      PIN3
 
@@ -31,15 +33,18 @@ void update_outputs() {
 	if (sw_off || sw_bat) {
 		// BAT bad or OFF state: all outputs off
 		PORT(CTRL_PRI_PORT, ODR) &= ~CTRL_PRI_PIN;
-		PORT(CTRL_HOME_PORT, ODR) &= ~CTRL_HOME_PIN;
+		PORT(CTRL_HOME24_PORT, ODR) &= ~CTRL_HOME24_PIN;
+		PORT(CTRL_HOME12_PORT, ODR) &= ~CTRL_HOME12_PIN;
 	} else if (sw_home) {
 		// Home: All outputs on
 		PORT(CTRL_PRI_PORT, ODR) |= CTRL_PRI_PIN;
-		PORT(CTRL_HOME_PORT, ODR) |= CTRL_HOME_PIN;
+		PORT(CTRL_HOME24_PORT, ODR) |= CTRL_HOME24_PIN;
+		PORT(CTRL_HOME12_PORT, ODR) |= CTRL_HOME12_PIN;
 	} else {
 		// Away: PRI on
 		PORT(CTRL_PRI_PORT, ODR) |= CTRL_PRI_PIN;
-		PORT(CTRL_HOME_PORT, ODR) &= ~CTRL_HOME_PIN;
+		PORT(CTRL_HOME24_PORT, ODR) &= ~CTRL_HOME24_PIN;
+		PORT(CTRL_HOME12_PORT, ODR) &= ~CTRL_HOME12_PIN;
 	}
 }
 
@@ -90,7 +95,8 @@ int main(void)
 
 	// MOSFET controls are push-pull outputs (CR1 already set)
 	PORT(CTRL_PRI_PORT, DDR) |= CTRL_PRI_PIN;
-	PORT(CTRL_HOME_PORT, DDR) |= CTRL_HOME_PIN;
+	PORT(CTRL_HOME24_PORT, DDR) |= CTRL_HOME24_PIN;
+	PORT(CTRL_HOME12_PORT, DDR) |= CTRL_HOME12_PIN;
 
 	// Interrupts on rising/falling edge on PORTC. TODO change
 	// this if inputs are somewhere else than PORTC
