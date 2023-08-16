@@ -1,6 +1,5 @@
 ## Select one of these
 DEVICE=stm8s003f3
-#DEVICE=stm8s103f3
 
 ## A directory for common include files
 COMMONDIR = ..
@@ -14,7 +13,6 @@ HEADERS=$(wildcard *.h $(COMMONDIR)/*.h)
 
 CC = sdcc
 PROGRAMMER = stlinkv2
-
 
 DEFINES=
 ## Set MCU-type DEFINE
