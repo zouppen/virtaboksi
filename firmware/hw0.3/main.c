@@ -1,25 +1,25 @@
-/* The "Hello world!" of microcontrollers. Blink LED on/off */
+/* Firmware for Virtaboksi v0.3 */
 #include <stdint.h>
 #include <stdbool.h>
 #include "stm8.h"
 
 // Pin configuration
-#define LED_PORT	PA
-#define LED_PIN         PIN3
-#define SW_OFF_PORT     PC
-#define SW_OFF_PIN      PIN7
-#define SW_BAT_PORT     PC
-#define SW_BAT_PIN      PIN6
-#define SW_HOME_PORT    PC
-#define SW_HOME_PIN     PIN5
-#define CTRL_HOME_PORT  PD
-#define CTRL_HOME_PIN   PIN2
-#define CTRL_PRI_PORT   PD
-#define CTRL_PRI_PIN    PIN3
+#define LED_PORT          PA
+#define LED_PIN           PIN3
+#define SW_OFF_PORT       PC
+#define SW_OFF_PIN        PIN7
+#define SW_BAT_PORT       PC
+#define SW_BAT_PIN        PIN6
+#define SW_HOME_PORT      PC
+#define SW_HOME_PIN       PIN5
+#define CTRL_HOME_PORT    PD
+#define CTRL_HOME_PIN     PIN2
+#define CTRL_PRI_PORT     PD
+#define CTRL_PRI_PIN      PIN3
 
 // On bootup, do control immediately, but not too immediately to avoid
 // oscillation in case of a boot loop.
-static uint16_t ctrl_debounce = 500;
+static volatile uint16_t ctrl_debounce = 500;
 
 void update_outputs(void);
 
