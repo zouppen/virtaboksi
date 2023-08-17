@@ -26,7 +26,7 @@ power good relay pins. If the charge controller can disconnect the
 load, you may just leave the pins unconnected of J2.
 
 Connect J1 to home/away switch. Three position switch is good since it
-allows positions off, away, and home. Pin 1 is off mode, 3 is common,
+allows positions off, away, and home. Pin 1 is off mode, 2 is common,
 and 3 is home. You may use either shorting or non-shorting rotary
 switch, since the middle position (away) is the middle (unconnected)
 positon.
