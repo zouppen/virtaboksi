@@ -27,7 +27,7 @@ void update_outputs(void);
 
 void update_outputs() {
 	bool sw_off = !(PORT(SW_OFF_PORT, IDR) &= SW_OFF_PIN);
-	bool sw_bat = !(PORT(SW_BAT_PORT, IDR) &= SW_BAT_PIN);
+	bool sw_bat = (PORT(SW_BAT_PORT, IDR) &= SW_BAT_PIN);
 	bool sw_home = !(PORT(SW_HOME_PORT, IDR) &= SW_HOME_PIN);
 
 	if (sw_off || sw_bat) {
@@ -49,7 +49,7 @@ void update_outputs() {
 }
 
 void debounce_start(void) __interrupt(EXTI3_IRQ) {
-	ctrl_debounce = 1000;
+	ctrl_debounce = 100;
 }
 
 void debounce_check(void) __interrupt(TIM2_OVR_UIF_IRQ) {
