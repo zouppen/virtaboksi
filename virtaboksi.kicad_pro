@@ -45,7 +45,7 @@
         "silk_text_upright": false,
         "zones": {
           "45_degree_only": false,
-          "min_clearance": 0.508
+          "min_clearance": 0.19999999999999998
         }
       },
       "diff_pair_dimensions": [
@@ -120,6 +120,7 @@
       },
       "track_widths": [
         0.0,
+        0.1,
         0.3,
         0.4,
         1.0
@@ -360,7 +361,7 @@
     "classes": [
       {
         "bus_width": 12.0,
-        "clearance": 0.2,
+        "clearance": 0.18,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -386,15 +387,16 @@
         "microvia_drill": 0.1,
         "name": "Power",
         "nets": [
-          "+BATT",
-          "HOME 12V",
-          "HOME 24V",
-          "PRI 12V",
-          "PRI 24V"
+          "/GROUP1 IN",
+          "/GROUP1 OUT",
+          "/GROUP2 IN",
+          "/GROUP2 OUT",
+          "/GROUP3 IN",
+          "/GROUP3 OUT"
         ],
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 1.8,
+        "track_width": 1.7,
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "wire_width": 6.0
@@ -458,6 +460,18 @@
     [
       "da59ae68-f393-46ca-9dbc-997cc5fffe89",
       ""
+    ],
+    [
+      "148741a4-2a3a-400f-b0f5-c870db1d25a5",
+      "mosfet_switch1"
+    ],
+    [
+      "7f5b3d8a-f2e8-4411-b65d-c45000044cfc",
+      "mosfet_switch2"
+    ],
+    [
+      "ba60f602-4c23-4608-995c-13acb059f1c3",
+      "mosfet_switch3"
     ]
   ],
   "text_variables": {}
