@@ -2043,10 +2043,6 @@
     (stroke (width 0) (type default) (color 0 0 0 0))
     (uuid aeac262a-a18a-41b4-af78-722673749105)
   )
-  (polyline (pts (xy 41.91 -6.985) (xy 44.45 -6.985))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid b070ca42-ad13-464a-9c84-2d6085f29c11)
-  )
 
   (wire (pts (xy 192.405 74.295) (xy 192.405 70.485))
     (stroke (width 0) (type default) (color 0 0 0 0))
@@ -3073,7 +3069,7 @@
     (property "Value" "Fuse" (id 1) (at 107.569 34.7222 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Connector_Wire:SolderWire-0.1sqmm_1x02_P3.6mm_D0.4mm_OD1mm" (id 2) (at 104.267 33.02 90)
+    (property "Footprint" "Own parts:Fuse-kindof_1x02_P3.6mm_D0.4mm_OD1mm" (id 2) (at 104.267 33.02 90)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 106.045 33.02 0)
@@ -3578,7 +3574,7 @@
       (reference "D8") (unit 1) (value "ZMM5V6-M") (footprint "Diode_SMD:D_MiniMELF")
     )
     (path "/8f380f3a-9869-4d12-8165-58912a424229"
-      (reference "F1") (unit 1) (value "Fuse") (footprint "Connector_Wire:SolderWire-0.1sqmm_1x02_P3.6mm_D0.4mm_OD1mm")
+      (reference "F1") (unit 1) (value "Fuse") (footprint "Own parts:Fuse-kindof_1x02_P3.6mm_D0.4mm_OD1mm")
     )
     (path "/e28091c3-0a59-44fc-bcbf-5122b14ff16b"
       (reference "H1") (unit 1) (value "MountingHole_Pad") (footprint "MountingHole:MountingHole_3.2mm_M3_Pad_Via")
