@@ -2604,7 +2604,7 @@
   (symbol (lib_id "Connector:Screw_Terminal_01x08") (at 158.75 121.92 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 1bb20b60-c240-45a3-8b39-4a64e7d30638)
-    (property "Reference" "J4" (id 0) (at 160.782 122.3553 0)
+    (property "Reference" "J1" (id 0) (at 160.782 122.3553 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "Panel_01x08" (id 1) (at 160.782 124.8922 0)
@@ -2741,7 +2741,7 @@
   (symbol (lib_id "Connector:Conn_01x03_Male") (at 113.665 149.225 0) (mirror y) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 39843b1b-17bb-49a5-b7e1-93a1228767c3)
-    (property "Reference" "J1" (id 0) (at 114.3762 148.3903 0)
+    (property "Reference" "J3" (id 0) (at 114.3762 148.3903 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "Optional_01x03" (id 1) (at 114.3762 150.9272 0)
@@ -3082,7 +3082,7 @@
   (symbol (lib_id "Connector:Conn_01x02_Male") (at 151.13 149.225 0) (mirror y) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 91bec629-c4a6-47bd-a435-b57ee40d6d6b)
-    (property "Reference" "J3" (id 0) (at 151.8412 149.6603 0)
+    (property "Reference" "J4" (id 0) (at 151.8412 149.6603 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "Optional_01x02_Male" (id 1) (at 151.8412 152.1972 0)
@@ -3606,17 +3606,17 @@
     (path "/ba60f602-4c23-4608-995c-13acb059f1c3/f9723dcc-a879-42ed-9261-6ff44b29958c"
       (reference "HS6") (unit 1) (value "Heatsink") (footprint "Own parts:Heatsink_AAVID_576802B03900G-nocourt")
     )
-    (path "/39843b1b-17bb-49a5-b7e1-93a1228767c3"
-      (reference "J1") (unit 1) (value "Optional_01x03") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical")
+    (path "/1bb20b60-c240-45a3-8b39-4a64e7d30638"
+      (reference "J1") (unit 1) (value "Panel_01x08") (footprint "Connector_Phoenix_MC:PhoenixContact_MCV_1,5_8-G-3.5_1x08_P3.50mm_Vertical")
     )
     (path "/16cdac4d-aef8-4a03-ba0c-34d3de957317"
       (reference "J2") (unit 1) (value "Ext_01x05") (footprint "Connector_Phoenix_MC:PhoenixContact_MCV_1,5_5-G-3.5_1x05_P3.50mm_Vertical")
     )
-    (path "/91bec629-c4a6-47bd-a435-b57ee40d6d6b"
-      (reference "J3") (unit 1) (value "Optional_01x02_Male") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
+    (path "/39843b1b-17bb-49a5-b7e1-93a1228767c3"
+      (reference "J3") (unit 1) (value "Optional_01x03") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical")
     )
-    (path "/1bb20b60-c240-45a3-8b39-4a64e7d30638"
-      (reference "J4") (unit 1) (value "Panel_01x08") (footprint "Connector_Phoenix_MC:PhoenixContact_MCV_1,5_8-G-3.5_1x08_P3.50mm_Vertical")
+    (path "/91bec629-c4a6-47bd-a435-b57ee40d6d6b"
+      (reference "J4") (unit 1) (value "Optional_01x02_Male") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
     )
     (path "/590d2007-4432-4cf1-bed4-e278a0f0bbe5"
       (reference "J5") (unit 1) (value "Powerpole 01x02") (footprint "Powerpole:45A-VERT-PAIR")
