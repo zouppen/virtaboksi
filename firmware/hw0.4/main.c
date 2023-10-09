@@ -1,23 +1,23 @@
-/* Firmware for Virtaboksi v0.3 */
+/* Firmware for Virtaboksi v0.4 */
 #include <stdint.h>
 #include <stdbool.h>
 #include "stm8.h"
 
 // Pin configuration
 #define LED_PORT          PD
-#define LED_PIN           PIN4
+#define LED_PIN           PIN1
 #define SW_OFF_PORT       PC
 #define SW_OFF_PIN        PIN5
 #define SW_BAT_PORT       PC
-#define SW_BAT_PIN        PIN4
+#define SW_BAT_PIN        PIN7
 #define SW_HOME_PORT      PC
-#define SW_HOME_PIN       PIN3
-#define CTRL_HOME24_PORT  PD
-#define CTRL_HOME24_PIN   PIN2
-#define CTRL_HOME12_PORT  PC
-#define CTRL_HOME12_PIN   PIN7
+#define SW_HOME_PIN       PIN4
+#define CTRL_HOME24_PORT  PA
+#define CTRL_HOME24_PIN   PIN1
+#define CTRL_HOME12_PORT  PA
+#define CTRL_HOME12_PIN   PIN2
 #define CTRL_PRI_PORT     PD
-#define CTRL_PRI_PIN      PIN3
+#define CTRL_PRI_PIN      PIN4
 
 // On bootup, do control immediately, but not too immediately to avoid
 // oscillation in case of a boot loop.
