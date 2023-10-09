@@ -12,10 +12,10 @@
 #define SW_BAT_PIN        PIN7
 #define SW_HOME_PORT      PC
 #define SW_HOME_PIN       PIN4
-#define CTRL_HOME24_PORT  PA
-#define CTRL_HOME24_PIN   PIN1
-#define CTRL_HOME12_PORT  PA
-#define CTRL_HOME12_PIN   PIN2
+#define CTRL_HOME1_PORT   PA
+#define CTRL_HOME1_PIN    PIN1
+#define CTRL_HOME2_PORT   PA
+#define CTRL_HOME2_PIN    PIN2
 #define CTRL_PRI_PORT     PD
 #define CTRL_PRI_PIN      PIN4
 
@@ -33,18 +33,18 @@ void update_outputs() {
 	if (sw_off || sw_bat) {
 		// BAT bad or OFF state: all outputs off
 		PORT(CTRL_PRI_PORT, ODR) &= ~CTRL_PRI_PIN;
-		PORT(CTRL_HOME24_PORT, ODR) &= ~CTRL_HOME24_PIN;
-		PORT(CTRL_HOME12_PORT, ODR) &= ~CTRL_HOME12_PIN;
+		PORT(CTRL_HOME1_PORT, ODR) &= ~CTRL_HOME1_PIN;
+		PORT(CTRL_HOME2_PORT, ODR) &= ~CTRL_HOME2_PIN;
 	} else if (sw_home) {
 		// Home: All outputs on
 		PORT(CTRL_PRI_PORT, ODR) |= CTRL_PRI_PIN;
-		PORT(CTRL_HOME24_PORT, ODR) |= CTRL_HOME24_PIN;
-		PORT(CTRL_HOME12_PORT, ODR) |= CTRL_HOME12_PIN;
+		PORT(CTRL_HOME1_PORT, ODR) |= CTRL_HOME1_PIN;
+		PORT(CTRL_HOME2_PORT, ODR) |= CTRL_HOME2_PIN;
 	} else {
 		// Away: PRI on
 		PORT(CTRL_PRI_PORT, ODR) |= CTRL_PRI_PIN;
-		PORT(CTRL_HOME24_PORT, ODR) &= ~CTRL_HOME24_PIN;
-		PORT(CTRL_HOME12_PORT, ODR) &= ~CTRL_HOME12_PIN;
+		PORT(CTRL_HOME1_PORT, ODR) &= ~CTRL_HOME1_PIN;
+		PORT(CTRL_HOME2_PORT, ODR) &= ~CTRL_HOME2_PIN;
 	}
 }
 
@@ -95,8 +95,8 @@ int main(void)
 
 	// MOSFET controls are push-pull outputs (CR1 already set)
 	PORT(CTRL_PRI_PORT, DDR) |= CTRL_PRI_PIN;
-	PORT(CTRL_HOME24_PORT, DDR) |= CTRL_HOME24_PIN;
-	PORT(CTRL_HOME12_PORT, DDR) |= CTRL_HOME12_PIN;
+	PORT(CTRL_HOME1_PORT, DDR) |= CTRL_HOME1_PIN;
+	PORT(CTRL_HOME2_PORT, DDR) |= CTRL_HOME2_PIN;
 
 	// Interrupts on rising/falling edge on PORTC. TODO change
 	// this if inputs are somewhere else than PORTC
