@@ -638,7 +638,7 @@
     (uuid fcf0f2f8-32ef-43d4-ab5b-89b25d503cb6)
   )
 
-  (text "Q2,Q3 max Vgs 20 V, fully saturated at 10V" (at 156.845 114.3 0)
+  (text "IRF4905 max Vgs 20 V, fully saturated at 10V" (at 156.845 114.3 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 964b6213-ded3-4cee-9e12-de9fd1adc9ea)
   )
