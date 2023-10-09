@@ -6,18 +6,18 @@
 // Pin configuration
 #define LED_PORT          PD
 #define LED_PIN           PIN1
-#define SW_AWAY_PORT      PC
-#define SW_AWAY_PIN       PIN5
 #define SW_BAT_PORT       PC
 #define SW_BAT_PIN        PIN7
+#define SW_AWAY_PORT      PC
+#define SW_AWAY_PIN       PIN5
 #define SW_HOME_PORT      PC
 #define SW_HOME_PIN       PIN4
+#define CTRL_PRI_PORT     PD
+#define CTRL_PRI_PIN      PIN4
 #define CTRL_HOME1_PORT   PA
 #define CTRL_HOME1_PIN    PIN1
 #define CTRL_HOME2_PORT   PA
 #define CTRL_HOME2_PIN    PIN2
-#define CTRL_PRI_PORT     PD
-#define CTRL_PRI_PIN      PIN4
 
 // On bootup, do control immediately, but not too immediately to avoid
 // oscillation in case of a boot loop.
@@ -26,12 +26,12 @@ static volatile uint16_t ctrl_debounce = 500;
 void update_outputs(void);
 
 void update_outputs() {
+	bool const sw_bat_bad = !(PORT(SW_BAT_PORT, IDR) &= SW_BAT_PIN);
 	bool const sw_away = !(PORT(SW_AWAY_PORT, IDR) &= SW_AWAY_PIN);
-	bool const sw_bat_good = PORT(SW_BAT_PORT, IDR) &= SW_BAT_PIN;
 	bool const sw_home = !(PORT(SW_HOME_PORT, IDR) &= SW_HOME_PIN);
 	bool const sw_main = sw_home || sw_away;
 
-	if (!sw_bat_good || !sw_main) {
+	if (sw_bat_bad || !sw_main) {
 		// BAT bad or OFF state: all outputs off
 		PORT(CTRL_PRI_PORT, ODR) &= ~CTRL_PRI_PIN;
 		PORT(CTRL_HOME1_PORT, ODR) &= ~CTRL_HOME1_PIN;
