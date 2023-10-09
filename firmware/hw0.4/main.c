@@ -6,8 +6,8 @@
 // Pin configuration
 #define LED_PORT          PD
 #define LED_PIN           PIN1
-#define SW_OFF_PORT       PC
-#define SW_OFF_PIN        PIN5
+#define SW_AWAY_PORT      PC
+#define SW_AWAY_PIN       PIN5
 #define SW_BAT_PORT       PC
 #define SW_BAT_PIN        PIN7
 #define SW_HOME_PORT      PC
@@ -26,11 +26,12 @@ static volatile uint16_t ctrl_debounce = 500;
 void update_outputs(void);
 
 void update_outputs() {
-	bool sw_off = !(PORT(SW_OFF_PORT, IDR) &= SW_OFF_PIN);
-	bool sw_bat = (PORT(SW_BAT_PORT, IDR) &= SW_BAT_PIN);
-	bool sw_home = !(PORT(SW_HOME_PORT, IDR) &= SW_HOME_PIN);
+	bool const sw_away = !(PORT(SW_AWAY_PORT, IDR) &= SW_AWAY_PIN);
+	bool const sw_bat_good = PORT(SW_BAT_PORT, IDR) &= SW_BAT_PIN;
+	bool const sw_home = !(PORT(SW_HOME_PORT, IDR) &= SW_HOME_PIN);
+	bool const sw_main = sw_home || sw_away;
 
-	if (sw_off || sw_bat) {
+	if (!sw_bat_good || !sw_main) {
 		// BAT bad or OFF state: all outputs off
 		PORT(CTRL_PRI_PORT, ODR) &= ~CTRL_PRI_PIN;
 		PORT(CTRL_HOME1_PORT, ODR) &= ~CTRL_HOME1_PIN;
@@ -89,7 +90,7 @@ int main(void)
 	PORT(LED_PORT, DDR) |= LED_PIN;
 
 	// Switches are inputs with interrupts and pull-up (CR1 already set)
-	PORT(SW_OFF_PORT, CR2) |= SW_OFF_PIN;
+	PORT(SW_AWAY_PORT, CR2) |= SW_AWAY_PIN;
 	PORT(SW_BAT_PORT, CR2) |= SW_BAT_PIN;
 	PORT(SW_HOME_PORT, CR2) |= SW_HOME_PIN;
 
