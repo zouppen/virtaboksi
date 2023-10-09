@@ -1,5 +1,5 @@
 ## Select one of these
-DEVICE=stm8s003f3
+DEVICE=stm8s003?3
 
 ## A directory for common include files
 COMMONDIR = ..
@@ -42,3 +42,4 @@ clean:
 
 flash: $(PROGRAM).ihx
 	stm8flash -c $(PROGRAMMER) -p $(DEVICE) -w $(PROGRAM).ihx
+	stm8flash -c $(PROGRAMMER) -p $(DEVICE) -v $(PROGRAM).ihx
