@@ -7,17 +7,23 @@
 #define LED_PORT          PD
 #define LED_PIN           PIN1
 #define SW_BAT_PORT       PC
-#define SW_BAT_PIN        PIN7
+#define SW_BAT_PIN        PIN5
 #define SW_AWAY_PORT      PC
-#define SW_AWAY_PIN       PIN5
+#define SW_AWAY_PIN       PIN7
 #define SW_HOME_PORT      PC
-#define SW_HOME_PIN       PIN4
+#define SW_HOME_PIN       PIN6
 #define CTRL_PRI_PORT     PD
 #define CTRL_PRI_PIN      PIN4
 #define CTRL_HOME1_PORT   PA
-#define CTRL_HOME1_PIN    PIN1
+#define CTRL_HOME1_PIN    PIN3
 #define CTRL_HOME2_PORT   PA
 #define CTRL_HOME2_PIN    PIN2
+#define LED_AWAY_PORT     PC
+#define LED_AWAY_PIN      PIN3
+#define LED_HOME_PORT     PB
+#define LED_HOME_PIN      PIN4
+#define LED_THIRD_PORT    PB
+#define LED_THIRD_PIN     PIN5
 
 // On bootup, do control immediately, but not too immediately to avoid
 // oscillation in case of a boot loop.
@@ -36,21 +42,33 @@ void update_outputs() {
 		PORT(CTRL_PRI_PORT, ODR) &= ~CTRL_PRI_PIN;
 		PORT(CTRL_HOME1_PORT, ODR) &= ~CTRL_HOME1_PIN;
 		PORT(CTRL_HOME2_PORT, ODR) &= ~CTRL_HOME2_PIN;
+		// Indicator LEDs
+		PORT(LED_AWAY_PORT, ODR) |= LED_AWAY_PIN;
+		PORT(LED_HOME_PORT, ODR) |= LED_HOME_PIN;
+		PORT(LED_THIRD_PORT, ODR) &= ~LED_THIRD_PIN;
 	} else if (sw_home) {
 		// Home: All outputs on
 		PORT(CTRL_PRI_PORT, ODR) |= CTRL_PRI_PIN;
 		PORT(CTRL_HOME1_PORT, ODR) |= CTRL_HOME1_PIN;
 		PORT(CTRL_HOME2_PORT, ODR) |= CTRL_HOME2_PIN;
+		// Indicator LEDs
+		PORT(LED_AWAY_PORT, ODR) |= LED_AWAY_PIN;
+		PORT(LED_HOME_PORT, ODR) &= ~LED_HOME_PIN;
+		PORT(LED_THIRD_PORT, ODR) |= LED_THIRD_PIN;
 	} else {
 		// Away: PRI on
 		PORT(CTRL_PRI_PORT, ODR) |= CTRL_PRI_PIN;
 		PORT(CTRL_HOME1_PORT, ODR) &= ~CTRL_HOME1_PIN;
 		PORT(CTRL_HOME2_PORT, ODR) &= ~CTRL_HOME2_PIN;
+		// Indicator LEDs
+		PORT(LED_AWAY_PORT, ODR) &= ~LED_AWAY_PIN;
+		PORT(LED_HOME_PORT, ODR) |= LED_HOME_PIN;
+		PORT(LED_THIRD_PORT, ODR) |= LED_THIRD_PIN;
 	}
 }
 
 void debounce_start(void) __interrupt(EXTI3_IRQ) {
-	ctrl_debounce = 100;
+	ctrl_debounce = 200;
 }
 
 void debounce_check(void) __interrupt(TIM2_OVR_UIF_IRQ) {
@@ -98,6 +116,11 @@ int main(void)
 	PORT(CTRL_PRI_PORT, DDR) |= CTRL_PRI_PIN;
 	PORT(CTRL_HOME1_PORT, DDR) |= CTRL_HOME1_PIN;
 	PORT(CTRL_HOME2_PORT, DDR) |= CTRL_HOME2_PIN;
+
+	// LEDs are push-pull outputs (CR1 already set)
+	PORT(LED_AWAY_PORT, DDR) |= LED_AWAY_PIN;
+	PORT(LED_HOME_PORT, DDR) |= LED_HOME_PIN;
+	PORT(LED_THIRD_PORT, DDR) |= LED_THIRD_PIN;
 
 	// Interrupts on rising/falling edge on PORTC. TODO change
 	// this if inputs are somewhere else than PORTC
