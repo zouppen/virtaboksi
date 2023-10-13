@@ -55,7 +55,7 @@ OUT1 its output (12V) to IN3.
 Maximum voltage in IN1 is 34 VDC. The limitation comes from the
 internal power supply. In case you want to use higher voltages in IN1,
 cut the trace F1 on the bottom of this board and power the system
-directly from a regulated 3.3V DC input via the terminals.
+directly from a regulated 3.3 VDC supply via the terminals.
 
 IN2 and IN3 are rated for 60 volts maximum, making it possible to
 control 48V nominal voltage loads. Minimum voltage for all groups is
