@@ -36,6 +36,8 @@ groups have different colors: red, yellow and blue.
 
 ### Home/away mode
 
+Status: 💚 **Functional**
+
 This unit provides *priority* output on OUT1 when the switch is in
 either *home* or *away* position. *Home* controls OUT2 and OUT3 groups
 and can be used to control two separate voltages as long as they have
@@ -75,6 +77,19 @@ connected to I3. When the input is high, the system is forced to off mode,
 ignoring the state of home/away switch.
 
 I4 is not used in this mode.
+
+### Water pump controller
+
+Status: 🔬 **Hardware OK**
+
+Hardware is capable, but no firmware support yet.
+
+### Generic Modbus RTU server
+
+Status: 🔬 **Hardware OK**
+
+RS-485 hardware is tested and some firmware tests performed, but no
+Modbus implementation exists yet.
 
 ## License
 
