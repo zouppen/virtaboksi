@@ -25,7 +25,7 @@ groups have different colors: red, yellow and blue.
   second and third group.
 * **High current** support. With passive cooling, 20 A loads can be
   controlled. MOSFETs are capable of switching over 100 A continuous
-  power in case cooling and traces are enforced.
+  current in case where cooling and PCB traces are reinforced.
 * **Small** size: Thanks to transistor control, the size is way smaller than for
   three contactors of similar rating.
 * **Low losses**: Internal resistance <10mΩ.
