@@ -31,6 +31,8 @@ groups have different colors: red, yellow and blue.
 * **Low losses**: Internal resistance <10mΩ.
 * **Rugged**: All digital I/O ports are short-circuit, reverse voltage and
   surge protected.
+* **Power saving**: When loads are off, the power is consumption minimal,
+  less than 5mW.
 
 ## Operating modes
 
