@@ -392,7 +392,8 @@
           "/GROUP2 IN",
           "/GROUP2 OUT",
           "/GROUP3 IN",
-          "/GROUP3 OUT"
+          "/GROUP3 OUT",
+          "/PWR1"
         ],
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
