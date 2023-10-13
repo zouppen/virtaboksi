@@ -78,13 +78,13 @@ ignoring the state of home/away switch.
 
 I4 is not used in this mode.
 
-### Water pump controller
+### Water pump controller mode
 
 Status: 🔬 **Hardware OK**
 
 Hardware is capable, but no firmware support yet.
 
-### Generic Modbus RTU server
+### Modbus RTU server mode
 
 Status: 🔬 **Hardware OK**
 
