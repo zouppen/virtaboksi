@@ -21,14 +21,15 @@ groups have different colors: red, yellow and blue.
 
 ## Design principles
 
-* Flexible voltage options; 10–34 V input on first group, 10–60 V on
+* **Flexible voltage** options; 10–34 V input on first group, 10–60 V on
   second and third group.
-* High current support. With passive cooling, three 20 A loads can be
-  controlled simultaneously.
-* Small size: Thanks to transistor control, the size is way smaller than for
+* **High current** support. With passive cooling, 20 A loads can be
+  controlled. MOSFETs are capable of switching over 100 A continuous
+  power in case cooling and traces are enforced.
+* **Small** size: Thanks to transistor control, the size is way smaller than for
   three contactors of similar rating.
-* Low losses: Internal resistance <10mΩ.
-* Rugged: All digital I/O ports are short-circuit, reverse voltage and
+* **Low losses**: Internal resistance <10mΩ.
+* **Rugged**: All digital I/O ports are short-circuit, reverse voltage and
   surge protected.
 
 ## Operating modes
