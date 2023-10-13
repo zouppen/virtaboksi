@@ -1,48 +1,65 @@
 # Virtaboksi
 
-12/24V power switch with home/away switch for use with a solar charge
-controller.
+Multi-purpose 3-channel 12–48 VDC common earth power switch with
+multiple operating modes:
+
+* Home/away switch supporting three individual groups and is optimized
+  for solar energy off-grid applications.
+
+* Water pump controller with pressure sensor input and control for
+  combined submersible and pressure pump system. Additionally, a
+  throw-over switching capability to drop loads while pumping.
+
+* General Modbus RTU server with 3 solid-state "coils, 3 digital
+  outputs and 4 digital inputs.
 
 ![3D model](docs/3d.avif)
 
 In the picture above the Powerpole connector colors are incorrect. Red
-is used for 24 volts and yellow for 12 volts, and black for the ground.
+is used for inputs and black for outputs. In a real product, the three
+groups have different colors: red, yellow and blue.
 
-## Principle of operation
+## Home/away mode
 
-This unit provides *priority* output for 24 V when the switch is in
-either *home* or *away* position. *Home* outputs for 24 V and 12 V are
-on when the switch is in *home* position. To use 12 V output, an
-external 24 volt to 12 volt DC converter is required.
+This unit provides *priority* output on OUT1 when the switch is in
+either *home* or *away* position. *Home* controls OUT2 and OUT3 groups
+and can be used to control two separate voltages as long as they have
+a common ground.
 
-The U1IN can control voltages from 10 to 34 volts, so you can also do
-the reverse, having 12 volt as the input voltage and have an
-(optional) 12 to 24 volts converter.
+An example use case is a solar off-grid system with two 12V batteries
+in series providing 24 volts, plus 12 volts generated from 24V using a
+step-down DC converter. DC converter is not included in the package.
 
-## How to connect
+In that case this switch can be used to turn the loads partially while
+being away, such as keeping refrigerator running but turning off
+lights while not present. When using a DC converter, its input is connected
+OUT1 its output (12V) to IN3.
 
-Connect J2 to NO and COM connectors of your solar charge controller
-power good relay pins. If the charge controller can disconnect the
-load, you may just leave the pins unconnected of J2.
+Maximum voltage in IN1 is 34 VDC. The limitation comes from the
+internal power supply. In case you want to use higher voltages in IN1,
+cut the trace F1 on the bottom of this board and power the system
+directly from a regulated 3.3V DC input via the terminals.
 
-Connect J1 to home/away switch. Three position switch is good since it
-allows positions off, away, and home. Pin 1 is off mode, 2 is common,
-and 3 is home. You may use either shorting or non-shorting rotary
-switch, since the middle position (away) is the middle (unconnected)
-positon.
+IN2 and IN3 are rated for 60 volts maximum, making it possible to
+control 48V nominal voltage loads. Minimum voltage for all groups is
+about 10 volts. Under 10 volts, MOSFET control becomes unreliable.
 
-If you have a DC converter, you may connect it to pin 3 (priority 
-Connect J6 pin 1 to DC/DC converter input pin (24V) and pin 2 to
-its output pin (12V).
+### How to connect
 
-Power connector block J3-J5 from left to right:
+In home/away mode, when I1 is shorted to the ground, the oprating mode
+is *away*. When I2 is shorted, the mode is *home*. If both connectors
+are open, operating mode is *off*.
 
-1. Ground
-2. Battery input 24V
-3. Priority output 24V
-4. Home output 24V
-5. 12V input
-6. Home output 12V
+Optionally, LED anodes can be connected directly to O1 and O2. They
+represent home and away operating modes, in that order. There is a
+current limiter controllable by R1 to limit the maximum current of
+O1...O3 to about 15 mA by default, so series resistors are not needed.
+
+If your solar controller has a low battery condition relay, it can be
+connected to I3. When the input is high, the system is forced to off mode,
+ignoring the state of home/away switch.
+
+I4 is not used in this mode.
 
 ## License
 
