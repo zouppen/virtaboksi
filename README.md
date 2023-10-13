@@ -1,7 +1,7 @@
 # Virtaboksi
 
 Virtaboksi is a multi-purpose 3-channel common-earth power switch,
-rating 12–48 VDC, 20 A. It has multiple operating modes:
+rating 12–48 VDC, 20 A. It has multiple operating modes:
 
 * Home/away switch supporting three individual groups and is optimized
   for solar energy off-grid applications.
@@ -19,7 +19,21 @@ In the picture above the Powerpole connector colors are incorrect. Red
 is used for inputs and black for outputs. In a real product, the three
 groups have different colors: red, yellow and blue.
 
-## Home/away mode
+## Design principles
+
+* Flexible voltage options; 10–34 V input on first group, 10–60 V on
+  second and third group.
+* High current support. With passive cooling, three 20 A loads can be
+  controlled simultaneously.
+* Small size: Thanks to transistor control, the size is way smaller than for
+  three contactors of similar rating.
+* Low losses: Internal resistance <10mΩ.
+* Rugged: All digital I/O ports are short-circuit, reverse voltage and
+  surge protected.
+
+## Operating modes
+
+### Home/away mode
 
 This unit provides *priority* output on OUT1 when the switch is in
 either *home* or *away* position. *Home* controls OUT2 and OUT3 groups
@@ -44,7 +58,7 @@ IN2 and IN3 are rated for 60 volts maximum, making it possible to
 control 48V nominal voltage loads. Minimum voltage for all groups is
 about 10 volts. Under 10 volts, MOSFET control becomes unreliable.
 
-### How to connect
+#### How to connect
 
 In home/away mode, when I1 is shorted to the ground, the oprating mode
 is *away*. When I2 is shorted, the mode is *home*. If both connectors
