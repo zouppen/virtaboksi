@@ -3,14 +3,14 @@
 Virtaboksi is a multi-purpose 3-channel common-earth power switch,
 rating 12–48 VDC, 20 A. It has multiple operating modes:
 
-* Home/away switch supporting three individual groups and is optimized
+* **Home/away switch** supporting three individual groups and is optimized
   for solar energy off-grid applications.
 
-* Water pump controller with pressure sensor input and control for
+* **Water pump controller** with pressure sensor input and control for
   combined submersible and pressure pump system. Additionally, a
   throw-over switching capability to drop loads while pumping.
 
-* Generic Modbus RTU server (slave) with 3 solid-state "coils", 3 digital
+* Generic **Modbus RTU server** (slave) with 3 solid-state "coils", 3 digital
   outputs, and 4 digital inputs.
 
 ![3D model](docs/3d.avif)
