@@ -54,4 +54,4 @@ License, or (at your option) any later version.
 The hardware is provided as source-available: The schematics and PCB
 layout are provided for reference only. The files can be freely
 distributed without limitations but no derivative works are allowed
-without the permission of copyright holders.
+without a permission from the copyright holders.
