@@ -32,7 +32,7 @@ groups have different colors: red, yellow and blue.
 * **Rugged**: All digital I/O ports are short-circuit, reverse voltage and
   surge protected.
 * **Power saving**: When loads are off, the power consumption is minimal,
-  less than 5mW.
+  less than 5mW, allowing it to be left powered on over dark winters.
 * **Hacker friendly**: You can create your own firmware for the STM8
   microcontroller, allowing real-time and stand-alone control of your
   loads and connectivity to other peripherals up to **1 km** distance
