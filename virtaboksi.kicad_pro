@@ -393,7 +393,16 @@
           "/GROUP2 OUT",
           "/GROUP3 IN",
           "/GROUP3 OUT",
-          "/PWR1"
+          "/PWR1",
+          "/mosfet_switch1/DRIVE",
+          "/mosfet_switch1/DRIVE_A",
+          "/mosfet_switch1/DRIVE_B",
+          "/mosfet_switch2/DRIVE",
+          "/mosfet_switch2/DRIVE_A",
+          "/mosfet_switch2/DRIVE_B",
+          "/mosfet_switch3/DRIVE",
+          "/mosfet_switch3/DRIVE_A",
+          "/mosfet_switch3/DRIVE_B"
         ],
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
