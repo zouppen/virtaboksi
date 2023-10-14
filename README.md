@@ -35,7 +35,7 @@ groups have different colors: red, yellow and blue.
   less than 5mW.
 * **Hacker friendly**: You can create your own firmware for the STM8
   microcontroller, allowing real-time and stand-alone control of your
-  loads.
+  loads and connectivity over RS-485.
 
 ## Operating modes
 
