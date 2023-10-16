@@ -4,6 +4,8 @@
 #include "stm8.h"
 
 #define SERIAL_POWERDOWN_MS 10000
+#define DEBOUNCE_MS 200
+#define STARTUP_DELAY_MS 500
 
 // Pin configuration
 #define PIN_IN1       PC,7
@@ -25,7 +27,7 @@
 
 // On bootup, have a small pause after bootup before switching loads,
 // to avoid oscillation in case of a boot loop.
-static volatile uint16_t ctrl_debounce = 500;
+static volatile uint16_t ctrl_debounce = STARTUP_DELAY_MS;
 
 // Serial activity counter
 static volatile uint16_t serial_runtime = 0;
@@ -93,7 +95,7 @@ void uart_rx(void) __interrupt(UART1_RX)
 }
 
 void int_on_portc(void) __interrupt(EXTI2_IRQ) {
-	ctrl_debounce = 200;
+	ctrl_debounce = DEBOUNCE_MS;
 }
 
 void int_on_portd(void) __interrupt(EXTI3_IRQ) {
@@ -129,15 +131,16 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 	if (serial_runtime) {
 		if (--serial_runtime) {
 			sleepy = false;
+		} else {
+			// Shut down serial receiver and prepare for a
+			// wakeup on start bit
+			UART1_CR2 &= ~UART_CR2_REN;
 		}
 	}
 
 	if (sleepy) {
 		// Indicator LED turns off
 		LOW(PIN_LED_PCB);
-
-		// Shut down serial and prepare for a wakeup on start bit
-		UART1_CR2 &= ~UART_CR2_REN;  // Receiver disable
 
 		// Nothing more to count, so halt the whole CPU
 		halt();
