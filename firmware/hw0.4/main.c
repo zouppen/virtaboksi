@@ -83,11 +83,11 @@ void uart_rx(void) __interrupt(UART1_RX)
 	}
 }
 
-void debounce_start(void) __interrupt(EXTI3_IRQ) {
+void debounce_start(void) __interrupt(EXTI2_IRQ) {
 	ctrl_debounce = 200;
 }
 
-void debounce_check(void) __interrupt(TIM2_OVR_UIF_IRQ) {
+void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 	// Clear Timer 2 Status Register 1 Update Interrupt Flag (UIF)
 	TIM2_SR1 &= ~TIM_SR1_UIF;
 	
