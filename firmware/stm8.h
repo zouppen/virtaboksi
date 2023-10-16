@@ -4,19 +4,28 @@
  */
 #pragma once
 
+// MACROS FOR EASY PIN HANDLING FOR ATMEL GCC-AVR, adapted to STM8
+// From https://stackoverflow.com/a/25986570/514723
 
-/* Handy macros for GPIO */
-#define CONCAT(a, b)    a##_##b
-#define PORT(a, b)      CONCAT(a , b)
+#define _BV(bit) (1U << (bit))
 
-#define PIN0    (1 << 0)
-#define PIN1    (1 << 1)
-#define PIN2    (1 << 2)
-#define PIN3    (1 << 3)
-#define PIN4    (1 << 4)
-#define PIN5    (1 << 5)
-#define PIN6    (1 << 6)
-#define PIN7    (1 << 7)
+// These macros are used indirectly by other macros.
+#define _SET(type,name,bit)          name##_##type |= _BV(bit)
+#define _CLEAR(type,name,bit)        name##_##type &= ~ _BV(bit)
+#define _TOGGLE(type,name,bit)       name##_##type ^= _BV(bit)
+#define _GET(type,name,bit)          ((name##_##type >> bit) &  1)
+#define _PUT(type,name,bit,value)    name##_##type = ( name##_##type & ( ~ _BV(bit)) ) | ( ( 1 & (unsigned char)value ) << bit )
+
+// These macros are used by end user.
+#define OUTPUT(pin)         _SET(DDR,pin)
+#define INPUT(pin)          _CLEAR(DDR,pin)
+#define HIGH(pin)           _SET(ODR,pin)
+#define LOW(pin)            _CLEAR(ODR,pin)
+#define TOGGLE(pin)         _TOGGLE(ODR,pin)
+#define READ(pin)           _GET(IDR,pin)
+#define STATE(pin)          _GET(ODR,pin)
+#define REG_HIGH(reg,pin)   _SET(reg,pin)
+#define REG_LOW(reg,pin)    _CLEAR(reg,pin)
 
 /* Register addresses */
 
