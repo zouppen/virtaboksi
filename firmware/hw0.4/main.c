@@ -22,7 +22,22 @@
 // to avoid oscillation in case of a boot loop.
 static volatile uint16_t ctrl_debounce = 500;
 
+bool uart1_baudrate(uint16_t rate);
 void update_outputs(void);
+
+bool uart1_baudrate(uint16_t rate) {
+	uint32_t const freq = 2000000;
+	uint32_t const div = freq/rate;
+
+	if (div > 0xffff) return false;
+	if (div < 16) return false;
+
+	// Pick up nibbles and write in correct order (BRR2 first)
+	UART1_BRR2 = ((div & 0xf000) >> 8) | (div & 0x000f);
+	UART1_BRR1 = (div & 0x0ff0) >> 4;
+
+	return true;
+}
 
 void update_outputs() {
 	bool const sw_away = !READ(PIN_IN1);
@@ -57,6 +72,14 @@ void update_outputs() {
 		LOW(PIN_OUT1);
 		HIGH(PIN_OUT2);
 		HIGH(PIN_OUT3);
+	}
+}
+
+void uart_rx(void) __interrupt(UART1_RX)
+{
+	// Incoming data
+	if (UART1_SR & UART_SR_RXNE) {
+		uint8_t const chr = UART1_DR;
 	}
 }
 
@@ -110,8 +133,8 @@ int main(void)
 	REG_HIGH(CR2, PIN_IN3);
 	REG_HIGH(CR2, PIN_IN4);
 
-	// MOSFET controls and LEDs are push-pull outputs (CR1 already
-	// set)
+	// MOSFET controls and LEDs are push-pull outputs
+	// (CR1 already set)
 	OUTPUT(PIN_GROUP1);
 	OUTPUT(PIN_GROUP2);
 	OUTPUT(PIN_GROUP3);
@@ -133,6 +156,20 @@ int main(void)
 	TIM2_IER |= TIM_IER_UIE;
 	// Control Register 1, Counter ENable bit (CEN)
 	TIM2_CR1 |= TIM_CR1_CEN;
+
+	// UART configuration
+	UART1_CR2 |=
+		UART_CR2_TEN |  // Transmitter enable
+		UART_CR2_REN |  // Receiver enable
+		UART_CR2_RIEN;  // Receiver interrupt enabled
+	UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
+	uart1_baudrate(9600);
+
+	// Turn on rs485 rx and put to receive mode
+	OUTPUT(PIN_TX_EN1);
+	OUTPUT(PIN_TX_EN2);
+	LOW(PIN_TX_EN1);
+	LOW(PIN_TX_EN2);
 
 	// Enabling interrupts should be the last part of
 	// initialization.
