@@ -128,7 +128,7 @@ int main(void)
 
 	// Enabling interrupts should be the last part of
 	// initialization.
-	enableInterrupts();
+	rim();
 
 	// Stay in light sleep to keep timers going (unless halted in interrupt)
 	while (true) {

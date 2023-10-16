@@ -297,8 +297,6 @@
 #define EXTI_CR2 *(volatile uint8_t *)0x50A1
 
 /* Interrupt commands */
-#define enableInterrupts()    {__asm__("rim\n");}  /* enable interrupts */
-#define disableInterrupts()   {__asm__("sim\n");}  /* disable interrupts */
 #define rim()                 {__asm__("rim\n");}  /* enable interrupts */
 #define sim()                 {__asm__("sim\n");}  /* disable interrupts */
 #define nop()                 {__asm__("nop\n");}  /* No Operation */
