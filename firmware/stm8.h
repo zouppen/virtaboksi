@@ -311,6 +311,7 @@
 #define ADC1_EOC_IRQ 22
 #define TIM4_OVR_UIF_IRQ 23
 #define EXTI2_IRQ 5
+#define EXTI3_IRQ 6
 #define UART1_TX 17
 #define UART1_RX 18
 

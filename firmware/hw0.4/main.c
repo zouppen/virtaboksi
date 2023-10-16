@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include "stm8.h"
 
+#define SERIAL_POWERDOWN_MS 10000
+
 // Pin configuration
 #define PIN_IN1       PC,7
 #define PIN_IN2       PC,6
@@ -18,9 +20,15 @@
 #define PIN_TX_EN1    PD,2
 #define PIN_TX_EN2    PD,3
 
+// Non-configurable
+#define PIN_RX        PD,6
+
 // On bootup, have a small pause after bootup before switching loads,
 // to avoid oscillation in case of a boot loop.
 static volatile uint16_t ctrl_debounce = 500;
+
+// Serial activity counter
+static volatile uint16_t serial_runtime = 0;
 
 bool uart1_baudrate(uint16_t rate);
 void update_outputs(void);
@@ -80,11 +88,22 @@ void uart_rx(void) __interrupt(UART1_RX)
 	// Incoming data
 	if (UART1_SR & UART_SR_RXNE) {
 		uint8_t const chr = UART1_DR;
+		serial_runtime = SERIAL_POWERDOWN_MS;
 	}
 }
 
 void debounce_start(void) __interrupt(EXTI2_IRQ) {
 	ctrl_debounce = 200;
+}
+
+void int_on_portd(void) __interrupt(EXTI3_IRQ) {
+	if (!serial_runtime && READ(PIN_RX)) {
+		// Receiver enable
+		UART1_CR2 |= UART_CR2_REN;
+
+		// Wait for data for 10 secs
+		serial_runtime = SERIAL_POWERDOWN_MS;
+	}
 }
 
 void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
@@ -94,17 +113,33 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 	// Blink the LED when in operation
 	TOGGLE(PIN_LED_PCB);
 
+	bool sleepy = true;
+
+	// Debounce countdown
 	if (ctrl_debounce) {
-		if (!--ctrl_debounce) {
-			// Indicator LED turns off
-			LOW(PIN_LED_PCB);
-
-			// Update outputs and then halt the whole CPU
+		if (--ctrl_debounce) {
+			sleepy = false;
+		} else {
 			update_outputs();
-
-			// When done counting, halt the whole CPU
-			halt();
 		}
+	}
+
+	// Serial runtime counter
+	if (serial_runtime) {
+		if (--serial_runtime) {
+			sleepy = false;
+		}
+	}
+
+	if (sleepy) {
+		// Indicator LED turns off
+		LOW(PIN_LED_PCB);
+
+		// Shut down serial and prepare for a wakeup on start bit
+		UART1_CR2 &= ~UART_CR2_REN;  // Receiver disable
+
+		// Nothing more to count, so halt the whole CPU
+		halt();
 	}
 }
 
@@ -133,6 +168,10 @@ int main(void)
 	REG_HIGH(CR2, PIN_IN3);
 	REG_HIGH(CR2, PIN_IN4);
 
+	// Serial traffic starts in standby mode
+	REG_LOW(CR1, PIN_RX); // We have external pull-up
+	REG_HIGH(CR2, PIN_RX); // Enable interrupts
+
 	// MOSFET controls and LEDs are push-pull outputs
 	// (CR1 already set)
 	OUTPUT(PIN_GROUP1);
@@ -142,9 +181,9 @@ int main(void)
 	OUTPUT(PIN_OUT2);
 	OUTPUT(PIN_OUT3);
 
-	// Interrupts on rising/falling edge on PORTC. TODO change
-	// this if inputs are somewhere else than PORTC
-	EXTI_CR1 |= 0x30;
+	// Interrupts on rising/falling edge on PORTC and PORTD. TODO
+	// change this if inputs are somewhere else!
+	EXTI_CR1 |= 0xf0;
 
 	// Timer configuration
 	// Prescaler register: 2MHz/2^4 = 125 kHz
@@ -160,7 +199,6 @@ int main(void)
 	// UART configuration
 	UART1_CR2 |=
 		UART_CR2_TEN |  // Transmitter enable
-		UART_CR2_REN |  // Receiver enable
 		UART_CR2_RIEN;  // Receiver interrupt enabled
 	UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
 	uart1_baudrate(9600);
