@@ -22,12 +22,12 @@ static volatile uint16_t ctrl_debounce = 500;
 void update_outputs(void);
 
 void update_outputs() {
-	bool const sw_bat_bad = !READ(SW_BAT);
+	bool const bat_good = READ(SW_BAT);
 	bool const sw_away = !READ(SW_AWAY);
 	bool const sw_home = !READ(SW_HOME);
 	bool const sw_main = sw_home || sw_away;
 
-	if (sw_bat_bad || !sw_main) {
+	if (!bat_good || !sw_main) {
 		// BAT bad or OFF state: all outputs off
 		LOW(CTRL_PRI);
 		LOW(CTRL_HOME1);
