@@ -3,9 +3,9 @@
 #include <stdbool.h>
 #include "stm8.h"
 
-#define SERIAL_POWERDOWN_MS 10000
 #define DEBOUNCE_MS 200
 #define STARTUP_DELAY_MS 500
+#define SERIAL_KEEPALIVE_MS 1000
 
 // Pin configuration
 #define PIN_IN1       PC,7
@@ -29,8 +29,9 @@
 // to avoid oscillation in case of a boot loop.
 static volatile uint16_t ctrl_debounce = STARTUP_DELAY_MS;
 
-// Serial activity counter
-static volatile uint16_t serial_runtime = 0;
+// Stay awake for a while to get full byte from serial before
+// sleeping again.
+static volatile uint16_t snooze_suppressor = 0;
 
 bool uart1_baudrate(uint16_t rate);
 void update_outputs(void);
@@ -49,7 +50,7 @@ bool uart1_baudrate(uint16_t rate) {
 	return true;
 }
 
-void update_outputs() {
+void update_outputs(void) {
 	bool const sw_away = !READ(PIN_IN1);
 	bool const sw_home = !READ(PIN_IN2);
 	bool const bat_good = READ(PIN_IN3);
@@ -90,7 +91,9 @@ void uart_rx(void) __interrupt(UART1_RX)
 	// Incoming data
 	if (UART1_SR & UART_SR_RXNE) {
 		uint8_t const chr = UART1_DR;
-		serial_runtime = SERIAL_POWERDOWN_MS;
+
+		// Keep CPU running
+		snooze_suppressor = MIN_WAKEUP_MS;
 	}
 }
 
@@ -99,14 +102,8 @@ void int_on_portc(void) __interrupt(EXTI2_IRQ) {
 }
 
 void int_on_portd(void) __interrupt(EXTI3_IRQ) {
-	// Have we woken up because of serial activity?
-	if (!serial_runtime && READ(PIN_RX)) {
-		// Receiver enable
-		UART1_CR2 |= UART_CR2_REN;
-
-		// Wait for data for 10 secs
-		serial_runtime = SERIAL_POWERDOWN_MS;
-	}
+	// Do not receive any more serial interrupts. We come here once after wake-up.
+	REG_LOW(CR2, PIN_RX);
 }
 
 void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
@@ -128,13 +125,9 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 	}
 
 	// Serial runtime counter
-	if (serial_runtime) {
-		if (--serial_runtime) {
+	if (snooze_suppressor) {
+		if (--snooze_suppressor) {
 			sleepy = false;
-		} else {
-			// Shut down serial receiver and prepare for a
-			// wakeup on start bit
-			UART1_CR2 &= ~UART_CR2_REN;
 		}
 	}
 
@@ -142,7 +135,12 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 		// Indicator LED turns off
 		LOW(PIN_LED_PCB);
 
-		// Nothing more to count, so halt the whole CPU
+		// Before sleeping, ensure we don't fall asleep right
+		// after wakeup. Also, enable interrupts on serial rx.
+		snooze_suppressor = SERIAL_KEEPALIVE_MS;
+		REG_HIGH(CR2, PIN_RX); // Enable serial interrupts
+
+		// Nothing more to count, so halt the whole CPU.
 		halt();
 	}
 }
@@ -172,7 +170,10 @@ int main(void)
 	REG_HIGH(CR2, PIN_IN3);
 	REG_HIGH(CR2, PIN_IN4);
 
-	// Serial traffic starts in standby mode
+	// "Unreal mode" for serial traffic. Enable interrupt for the
+	// serial pin and it magically wakes up after serial activity,
+	// although this shouldn't be possible according to STM8S data
+	// sheet (rx can't emit an interrupt while in HALT mode.
 	REG_LOW(CR1, PIN_RX); // We have external pull-up
 	REG_HIGH(CR2, PIN_RX); // Enable interrupts
 
@@ -185,9 +186,9 @@ int main(void)
 	OUTPUT(PIN_OUT2);
 	OUTPUT(PIN_OUT3);
 
-	// Interrupts on rising/falling edge on PORTC and PORTD. TODO
+	// Interrupts on rising/falling edge on PORTC. TODO
 	// change this if inputs are somewhere else!
-	EXTI_CR1 |= 0xf0;
+	EXTI_CR1 |= 0x30;
 
 	// Timer configuration
 	// Prescaler register: 2MHz/2^4 = 125 kHz
@@ -203,6 +204,7 @@ int main(void)
 	// UART configuration
 	UART1_CR2 |=
 		UART_CR2_TEN |  // Transmitter enable
+		UART_CR2_REN |  // Receiver enable
 		UART_CR2_RIEN;  // Receiver interrupt enabled
 	UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
 	uart1_baudrate(9600);
