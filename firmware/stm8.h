@@ -2,8 +2,7 @@
  * Register definitions for STM8S103 (and STM8S003)
  * Still incomplete.
  */
-#ifndef _STH8_H
-#define _STH8_H
+#pragma once
 
 
 /* Handy macros for GPIO */
@@ -358,5 +357,3 @@ ADC1 22
 TIM4_UPD_OVF 23
 EEPROM_EEC 24
 */
-
-#endif
