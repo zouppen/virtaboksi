@@ -90,7 +90,7 @@ void debounce_start(void) __interrupt(EXTI2_IRQ) {
 void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 	// Clear Timer 2 Status Register 1 Update Interrupt Flag (UIF)
 	TIM2_SR1 &= ~TIM_SR1_UIF;
-	
+
 	// Blink the LED when in operation
 	TOGGLE(PIN_LED_PCB);
 
@@ -118,7 +118,7 @@ int main(void)
 	PB_CR1 = 0xFF;
 	PC_CR1 = 0xFF;
 	PD_CR1 = 0xFF;
-	
+
 	// LED is push-pull output (CR1 already set)
 	OUTPUT(PIN_LED_PCB);
 
@@ -148,7 +148,7 @@ int main(void)
 
 	// Timer configuration
 	// Prescaler register: 2MHz/2^4 = 125 kHz
-	TIM2_PSCR = 4; // 
+	TIM2_PSCR = 4;
 	// Counter Auto-Reload Registers. TIM2_ARR = 125, 1 millisecond
 	TIM2_ARRH = 0;
 	TIM2_ARRL = 125;

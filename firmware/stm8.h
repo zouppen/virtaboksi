@@ -30,10 +30,10 @@
 /* Register addresses */
 
 /* Clock */
-#define CLK_CKDIVR	*(volatile uint8_t *)0x50C6
-#define CLK_ICKR	*(volatile uint8_t *)0x50C0
-#define CLK_SWR		*(volatile uint8_t *)0x50C4
-#define CLK_SWCR	*(volatile uint8_t *)0x50C5
+#define CLK_CKDIVR      *(volatile uint8_t *)0x50C6
+#define CLK_ICKR        *(volatile uint8_t *)0x50C0
+#define CLK_SWR         *(volatile uint8_t *)0x50C4
+#define CLK_SWCR        *(volatile uint8_t *)0x50C5
 
 /* GPIO */
 #define PA_ODR *(volatile unsigned char *)0x5000
