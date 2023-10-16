@@ -15,8 +15,8 @@
 #define LED_HOME     PB,4
 #define LED_THIRD    PB,5
 
-// On bootup, do control immediately, but not too immediately to avoid
-// oscillation in case of a boot loop.
+// On bootup, have a small pause after bootup before switching loads,
+// to avoid oscillation in case of a boot loop.
 static volatile uint16_t ctrl_debounce = 500;
 
 void update_outputs(void);
