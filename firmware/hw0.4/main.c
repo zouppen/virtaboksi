@@ -87,8 +87,7 @@ int main(void)
 	// Not changing clock speed, running on default of 2 MHz
 
 	// As suggested in chapter 11.5 of RM0016, unused pins are set
-	// to pull-up state. We make them all pull-up first and then
-	// set outputs.
+	// to pull-up state. We make them all pull-up first, it's safe.
 	PA_CR1 = 0xFF;
 	PB_CR1 = 0xFF;
 	PC_CR1 = 0xFF;
@@ -97,7 +96,11 @@ int main(void)
 	// LED is push-pull output (CR1 already set)
 	OUTPUT(LED_DEBUG);
 
-	// Switches are inputs with interrupts and pull-up (CR1 already set)
+	// Inputs have already pull-up resistors, so we turn pull-up
+	// off (CR1) and enable interrupts (CR2).
+	REG_LOW(CR1, SW_AWAY);
+	REG_LOW(CR1, SW_HOME);
+	REG_LOW(CR1, SW_BAT);
 	REG_HIGH(CR2, SW_AWAY);
 	REG_HIGH(CR2, SW_HOME);
 	REG_HIGH(CR2, SW_BAT);
