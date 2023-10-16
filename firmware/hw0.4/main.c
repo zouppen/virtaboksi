@@ -4,16 +4,19 @@
 #include "stm8.h"
 
 // Pin configuration
-#define LED_DEBUG    PD,1
-#define SW_BAT       PC,5
-#define SW_AWAY      PC,7
-#define SW_HOME      PC,6
-#define CTRL_PRI     PD,4
-#define CTRL_HOME1   PA,3
-#define CTRL_HOME2   PA,2
-#define LED_AWAY     PC,3
-#define LED_HOME     PB,4
-#define LED_THIRD    PB,5
+#define PIN_IN1       PC,7
+#define PIN_IN2       PC,6
+#define PIN_IN3       PC,5
+#define PIN_IN4       PC,4
+#define PIN_GROUP1    PD,4
+#define PIN_GROUP2    PA,3
+#define PIN_GROUP3    PA,2
+#define PIN_OUT1      PC,3
+#define PIN_OUT2      PB,4
+#define PIN_OUT3      PB,5
+#define PIN_LED_PCB   PD,1
+#define PIN_TX_EN1    PD,2
+#define PIN_TX_EN2    PD,3
 
 // On bootup, have a small pause after bootup before switching loads,
 // to avoid oscillation in case of a boot loop.
@@ -22,38 +25,38 @@ static volatile uint16_t ctrl_debounce = 500;
 void update_outputs(void);
 
 void update_outputs() {
-	bool const bat_good = READ(SW_BAT);
-	bool const sw_away = !READ(SW_AWAY);
-	bool const sw_home = !READ(SW_HOME);
+	bool const sw_away = !READ(PIN_IN1);
+	bool const sw_home = !READ(PIN_IN2);
+	bool const bat_good = READ(PIN_IN3);
 	bool const sw_main = sw_home || sw_away;
 
 	if (!bat_good || !sw_main) {
 		// BAT bad or OFF state: all outputs off
-		LOW(CTRL_PRI);
-		LOW(CTRL_HOME1);
-		LOW(CTRL_HOME2);
+		LOW(PIN_GROUP1);
+		LOW(PIN_GROUP2);
+		LOW(PIN_GROUP3);
 		// Indicator LEDs
-		HIGH(LED_AWAY);
-		HIGH(LED_HOME);
-		LOW(LED_THIRD);
+		HIGH(PIN_OUT1);
+		HIGH(PIN_OUT2);
+		LOW(PIN_OUT3);
 	} else if (sw_home) {
 		// Home: All outputs on
-		HIGH(CTRL_PRI);
-		HIGH(CTRL_HOME1);
-		HIGH(CTRL_HOME2);
+		HIGH(PIN_GROUP1);
+		HIGH(PIN_GROUP2);
+		HIGH(PIN_GROUP3);
 		// Indicator LEDs
-		HIGH(LED_AWAY);
-		LOW(LED_HOME);
-		HIGH(LED_THIRD);
+		HIGH(PIN_OUT1);
+		LOW(PIN_OUT2);
+		HIGH(PIN_OUT3);
 	} else {
 		// Away: PRI on
-		HIGH(CTRL_PRI);
-		LOW(CTRL_HOME1);
-		LOW(CTRL_HOME2);
+		HIGH(PIN_GROUP1);
+		LOW(PIN_GROUP2);
+		LOW(PIN_GROUP3);
 		// Indicator LEDs
-		LOW(LED_AWAY);
-		HIGH(LED_HOME);
-		HIGH(LED_THIRD);
+		LOW(PIN_OUT1);
+		HIGH(PIN_OUT2);
+		HIGH(PIN_OUT3);
 	}
 }
 
@@ -66,12 +69,12 @@ void debounce_check(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 	TIM2_SR1 &= ~TIM_SR1_UIF;
 	
 	// Blink the LED when in operation
-	TOGGLE(LED_DEBUG);
+	TOGGLE(PIN_LED_PCB);
 
 	if (ctrl_debounce) {
 		if (!--ctrl_debounce) {
 			// Indicator LED turns off
-			LOW(LED_DEBUG);
+			LOW(PIN_LED_PCB);
 
 			// Update outputs and then halt the whole CPU
 			update_outputs();
@@ -94,25 +97,27 @@ int main(void)
 	PD_CR1 = 0xFF;
 	
 	// LED is push-pull output (CR1 already set)
-	OUTPUT(LED_DEBUG);
+	OUTPUT(PIN_LED_PCB);
 
 	// Inputs have already pull-up resistors, so we turn pull-up
 	// off (CR1) and enable interrupts (CR2).
-	REG_LOW(CR1, SW_AWAY);
-	REG_LOW(CR1, SW_HOME);
-	REG_LOW(CR1, SW_BAT);
-	REG_HIGH(CR2, SW_AWAY);
-	REG_HIGH(CR2, SW_HOME);
-	REG_HIGH(CR2, SW_BAT);
+	REG_LOW(CR1, PIN_IN1);
+	REG_LOW(CR1, PIN_IN2);
+	REG_LOW(CR1, PIN_IN3);
+	REG_LOW(CR1, PIN_IN4);
+	REG_HIGH(CR2, PIN_IN1);
+	REG_HIGH(CR2, PIN_IN2);
+	REG_HIGH(CR2, PIN_IN3);
+	REG_HIGH(CR2, PIN_IN4);
 
 	// MOSFET controls and LEDs are push-pull outputs (CR1 already
 	// set)
-	OUTPUT(CTRL_PRI);
-	OUTPUT(CTRL_HOME1);
-	OUTPUT(CTRL_HOME2);
-	OUTPUT(LED_AWAY);
-	OUTPUT(LED_HOME);
-	OUTPUT(LED_THIRD);
+	OUTPUT(PIN_GROUP1);
+	OUTPUT(PIN_GROUP2);
+	OUTPUT(PIN_GROUP3);
+	OUTPUT(PIN_OUT1);
+	OUTPUT(PIN_OUT2);
+	OUTPUT(PIN_OUT3);
 
 	// Interrupts on rising/falling edge on PORTC. TODO change
 	// this if inputs are somewhere else than PORTC
