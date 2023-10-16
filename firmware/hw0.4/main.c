@@ -92,11 +92,12 @@ void uart_rx(void) __interrupt(UART1_RX)
 	}
 }
 
-void debounce_start(void) __interrupt(EXTI2_IRQ) {
+void int_on_portc(void) __interrupt(EXTI2_IRQ) {
 	ctrl_debounce = 200;
 }
 
 void int_on_portd(void) __interrupt(EXTI3_IRQ) {
+	// Have we woken up because of serial activity?
 	if (!serial_runtime && READ(PIN_RX)) {
 		// Receiver enable
 		UART1_CR2 |= UART_CR2_REN;
