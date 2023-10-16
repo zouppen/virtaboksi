@@ -11,9 +11,9 @@
 #define PIN_GROUP1    PD,4
 #define PIN_GROUP2    PA,3
 #define PIN_GROUP3    PA,2
-#define PIN_OUT1      PC,3
-#define PIN_OUT2      PB,4
-#define PIN_OUT3      PB,5
+#define PIN_OUT1      PB,4
+#define PIN_OUT2      PB,5
+#define PIN_OUT3      PC,3
 #define PIN_LED_PCB   PD,1
 #define PIN_TX_EN1    PD,2
 #define PIN_TX_EN2    PD,3
