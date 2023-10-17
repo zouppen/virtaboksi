@@ -91,6 +91,7 @@ void uart_rx(void) __interrupt(UART1_RX)
 {
 	// Incoming data
 	if (UART1_SR & UART_SR_RXNE) {
+		// Reading the byte also clears the RXNE flag
 		uint8_t const chr = UART1_DR;
 
 		// Keep CPU running
