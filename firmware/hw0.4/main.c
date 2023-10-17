@@ -105,8 +105,8 @@ void int_on_portc(void) __interrupt(EXTI2_IRQ) {
 }
 
 void int_on_portd(void) __interrupt(EXTI3_IRQ) {
-	// Do not receive any more serial interrupts. We come here once after wake-up.
-	REG_LOW(CR2, PIN_RX);
+	// Sometimes we come here because we wake up from serial
+	// activity.
 }
 
 void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
@@ -136,16 +136,23 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 
 	// If we don't have any ongoing tasks, prepare for a halt.
 	if (sleepy) {
-		// Indicator LED turns off
+		// Enable serial interrupts to wake up from serial ("unreal")
+		REG_HIGH(CR2, PIN_RX);
+
+		// Turn off the running indicator and halt the whole CPU.
 		LOW(PIN_LED_PCB);
-
-		// Before sleeping, ensure we don't fall asleep right
-		// after wakeup. Also, enable interrupts on serial rx.
-		snooze_suppressor = MINIMUM_WAKEUP_MS;
-		REG_HIGH(CR2, PIN_RX); // Enable serial interrupts
-
-		// Nothing more to count, so halt the whole CPU.
 		halt();
+
+		// WAKE UP!! Rise and shine!
+
+		// Suppress double interrupts on serial activity
+		REG_LOW(CR2, PIN_RX);
+
+		// We might have woken up because of start bit on UART
+		// line, meaning the first byte hasn't been yet
+		// received. We have to stay awake until we know if we
+		// receive any.
+		snooze_suppressor = MINIMUM_WAKEUP_MS;
 	}
 }
 
