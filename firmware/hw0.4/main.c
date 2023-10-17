@@ -5,6 +5,7 @@
 
 #define DEBOUNCE_MS 200
 #define STARTUP_DEBOUNCE_MS 500
+#define MINIMUM_WAKEUP_MS 100
 #define SERIAL_KEEPALIVE_MS 1000
 
 // Pin configuration (Board version specific)
@@ -31,7 +32,7 @@ static volatile uint16_t ctrl_debounce = STARTUP_DEBOUNCE_MS;
 
 // Stay awake for a while to get full byte from serial before
 // sleeping again.
-static volatile uint16_t snooze_suppressor = 0;
+static volatile uint16_t snooze_suppressor = SERIAL_KEEPALIVE_MS;
 
 bool uart1_baudrate(uint16_t rate);
 void update_outputs(void);
@@ -95,7 +96,7 @@ void uart_rx(void) __interrupt(UART1_RX)
 		uint8_t const chr = UART1_DR;
 
 		// Keep CPU running
-		snooze_suppressor = MIN_WAKEUP_MS;
+		snooze_suppressor = SERIAL_KEEPALIVE_MS;
 	}
 }
 
@@ -140,7 +141,7 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 
 		// Before sleeping, ensure we don't fall asleep right
 		// after wakeup. Also, enable interrupts on serial rx.
-		snooze_suppressor = SERIAL_KEEPALIVE_MS;
+		snooze_suppressor = MINIMUM_WAKEUP_MS;
 		REG_HIGH(CR2, PIN_RX); // Enable serial interrupts
 
 		// Nothing more to count, so halt the whole CPU.
