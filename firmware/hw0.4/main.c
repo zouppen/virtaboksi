@@ -4,7 +4,7 @@
 #include "stm8.h"
 
 #define DEBOUNCE_MS 200
-#define STARTUP_DELAY_MS 500
+#define STARTUP_DEBOUNCE_MS 500
 #define SERIAL_KEEPALIVE_MS 1000
 
 // Pin configuration (Board version specific)
@@ -27,7 +27,7 @@
 
 // On bootup, have a small pause after bootup before switching loads,
 // to avoid oscillation in case of a boot loop.
-static volatile uint16_t ctrl_debounce = STARTUP_DELAY_MS;
+static volatile uint16_t ctrl_debounce = STARTUP_DEBOUNCE_MS;
 
 // Stay awake for a while to get full byte from serial before
 // sleeping again.
