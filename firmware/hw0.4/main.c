@@ -7,7 +7,7 @@
 #define STARTUP_DELAY_MS 500
 #define SERIAL_KEEPALIVE_MS 1000
 
-// Pin configuration
+// Pin configuration (Board version specific)
 #define PIN_IN1       PC,7
 #define PIN_IN2       PC,6
 #define PIN_IN3       PC,5
@@ -22,7 +22,7 @@
 #define PIN_TX_EN1    PD,2
 #define PIN_TX_EN2    PD,3
 
-// Non-configurable
+// Non-configurable (MCU specific)
 #define PIN_RX        PD,6
 
 // On bootup, have a small pause after bootup before switching loads,
@@ -132,6 +132,7 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 		}
 	}
 
+	// If we don't have any ongoing tasks, prepare for a halt.
 	if (sleepy) {
 		// Indicator LED turns off
 		LOW(PIN_LED_PCB);
