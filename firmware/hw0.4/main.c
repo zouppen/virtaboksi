@@ -37,8 +37,9 @@ bool uart1_baudrate(uint16_t rate);
 void update_outputs(void);
 
 bool uart1_baudrate(uint16_t rate) {
+	// Divide cpu freq with baud rate, rounding to nearest.
 	uint32_t const freq = 2000000;
-	uint32_t const div = freq/rate;
+	uint32_t const div = (freq + (rate >> 1))/rate;
 
 	if (div > 0xffff) return false;
 	if (div < 16) return false;
