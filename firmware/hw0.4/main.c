@@ -173,8 +173,8 @@ void int_on_portc(void) __interrupt(EXTI2_IRQ) {
 }
 
 void int_on_portd(void) __interrupt(EXTI3_IRQ) {
-	// Sometimes we come here because we wake up from serial
-	// activity.
+	// OBS! When we wake up from serial activity, we get here once
+	// and it's inevitable.
 }
 
 void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
