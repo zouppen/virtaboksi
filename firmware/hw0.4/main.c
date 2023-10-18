@@ -37,9 +37,19 @@ static volatile uint16_t snooze_suppressor = 0;
 // A global flag for carrying state from ISR to main loop
 static volatile bool should_halt = false;
 
+uint8_t rot13(uint8_t c);
 void maybe_halt(void);
 bool uart1_baudrate(uint16_t rate);
 void update_outputs(void);
+
+uint8_t rot13(uint8_t c)
+{
+	if (c < 'a') return c;
+	if (c > 'z') return c;
+	c += 13;
+	if (c > 'z') c -= 26;
+	return c;
+}
 
 // Halts CPU if wanted. This must be called outside interrupt
 // handlers.
@@ -142,6 +152,18 @@ void uart_rx(void) __interrupt(UART1_RX)
 
 		// Keep CPU running
 		snooze_suppressor = SERIAL_KEEPALIVE_MS;
+
+		// Funny little test
+		uint8_t const out = rot13(chr);
+
+		// Enable RS-485
+		HIGH(PIN_TX_EN1);
+		HIGH(PIN_TX_EN2);
+
+		// Transmit first byte and enable interrupt to send
+		// more later.
+		UART1_DR = out;
+		UART1_CR2 |= UART_CR2_TIEN;
 	}
 }
 
