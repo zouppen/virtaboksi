@@ -145,6 +145,21 @@ void uart_rx(void) __interrupt(UART1_RX)
 	}
 }
 
+void uart_tx(void) __interrupt(UART1_TX)
+{
+	// Serial transmit finished
+	if (UART1_SR & UART_SR_TC) {
+		// Clearing the flag
+		UART1_SR &= ~UART_SR_TC;
+
+		// TODO check if we are not trying to transmit more.
+
+		// Turn off RS-485 transmitter
+		LOW(PIN_TX_EN1);
+		LOW(PIN_TX_EN2);
+	}
+}
+
 void int_on_portc(void) __interrupt(EXTI2_IRQ) {
 	ctrl_debounce = DEBOUNCE_MS;
 }
@@ -178,6 +193,9 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 			sleepy = false;
 		}
 	}
+
+	// If transmitting, no sleep
+	sleepy = sleepy && !STATE(PIN_TX_EN1);
 
 	// If we don't have any ongoing tasks, prepare for a halt.
 	should_halt = sleepy;
@@ -237,9 +255,10 @@ int main(void)
 
 	// UART configuration
 	UART1_CR2 |=
-		UART_CR2_TEN |  // Transmitter enable
-		UART_CR2_REN |  // Receiver enable
-		UART_CR2_RIEN;  // Receiver interrupt enabled
+		UART_CR2_TEN |   // Enable TX
+		UART_CR2_TCIEN | // Enable TX complete interrupt
+		UART_CR2_REN |   // Receiver enable
+		UART_CR2_RIEN;   // Receiver interrupt enabled
 	UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
 	uart1_baudrate(9600);
 
