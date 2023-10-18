@@ -150,9 +150,6 @@ void uart_rx(void) __interrupt(UART1_RX)
 		// Reading the byte also clears the RXNE flag
 		uint8_t const chr = UART1_DR;
 
-		// Keep CPU running
-		snooze_suppressor = SERIAL_KEEPALIVE_MS;
-
 		// Funny little test
 		uint8_t const out = rot13(chr);
 
