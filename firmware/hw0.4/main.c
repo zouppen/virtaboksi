@@ -35,10 +35,10 @@ static volatile uint16_t ctrl_debounce = STARTUP_DEBOUNCE_MS;
 static volatile uint16_t snooze_suppressor = 0;
 
 // A global flag for carrying state from ISR to main loop
-static volatile bool should_halt = false;
+static volatile bool may_halt = false;
 
 uint8_t rot13(uint8_t c);
-void maybe_halt(void);
+void controlled_halt(void);
 bool uart1_baudrate(uint16_t rate);
 void update_outputs(void);
 
@@ -51,16 +51,13 @@ uint8_t rot13(uint8_t c)
 	return c;
 }
 
-// Halts CPU if wanted. This must be called outside interrupt
-// handlers.
-void maybe_halt(void)
+// Halts CPU. This must be called outside of interrupt handlers.
+void controlled_halt(void)
 {
-	if (!should_halt) return;
-
 	// Must not go to interrupts while preparing halt()
 	sim();
 
-	should_halt = false;
+	may_halt = false;
 
 	// "Unreal mode" for serial traffic. Enable interrupt for the
 	// serial pin and it magically wakes up after serial activity,
@@ -225,7 +222,7 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 	sleepy = sleepy && !STATE(PIN_TX_EN1);
 
 	// If we don't have any ongoing tasks, prepare for a halt.
-	should_halt = sleepy;
+	may_halt = sleepy;
 }
 
 int main(void)
@@ -298,9 +295,13 @@ int main(void)
 	// initialization.
 	rim();
 
-	// Stay in light sleep to keep timers going (unless halted in interrupt)
+	// Stay in light sleep to keep timers going. If nothing to
+	// run, go to halt mode.
 	while (true) {
-		wfi();
-		maybe_halt();
+		if (may_halt) {
+			controlled_halt();
+		} else {
+			wfi();
+		}
 	}
 }
