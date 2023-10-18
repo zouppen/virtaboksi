@@ -147,12 +147,20 @@ void uart_rx(void) __interrupt(UART1_RX)
 
 void uart_tx(void) __interrupt(UART1_TX)
 {
+	// Serial transmit buffer empty
+	if (UART1_SR & UART_SR_TXE) {
+		// Check if want to transmit more
+		// TODO
+
+		// Our transmit buffer is empty, do not come here
+		// again and wait enable the TX ready interrupt
+		UART1_CR2 ^= UART_CR2_TIEN | UART_CR2_TCIEN;
+	}
+
 	// Serial transmit finished
 	if (UART1_SR & UART_SR_TC) {
-		// Clearing the flag
-		UART1_SR &= ~UART_SR_TC;
-
-		// TODO check if we are not trying to transmit more.
+		// Transmit finished
+		UART1_CR2 &= ~UART_CR2_TCIEN; // Do not notify more
 
 		// Turn off RS-485 transmitter
 		LOW(PIN_TX_EN1);
@@ -256,7 +264,6 @@ int main(void)
 	// UART configuration
 	UART1_CR2 |=
 		UART_CR2_TEN |   // Enable TX
-		UART_CR2_TCIEN | // Enable TX complete interrupt
 		UART_CR2_REN |   // Receiver enable
 		UART_CR2_RIEN;   // Receiver interrupt enabled
 	UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
