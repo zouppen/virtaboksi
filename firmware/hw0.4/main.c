@@ -34,8 +34,53 @@ static volatile uint16_t ctrl_debounce = STARTUP_DEBOUNCE_MS;
 // sleeping again.
 static volatile uint16_t snooze_suppressor = SERIAL_KEEPALIVE_MS;
 
+// A global flag for carrying state from ISR to main loop
+static volatile bool should_halt = false;
+
+void maybe_halt(void);
 bool uart1_baudrate(uint16_t rate);
 void update_outputs(void);
+
+// Halts CPU if wanted. This must be called outside interrupt
+// handlers.
+void maybe_halt(void)
+{
+	if (!should_halt) return;
+
+	// Must not go to interrupts while preparing halt()
+	sim();
+
+	should_halt = false;
+
+	// "Unreal mode" for serial traffic. Enable interrupt for the
+	// serial pin and it magically wakes up after serial activity,
+	// although this shouldn't be possible according to STM8S data
+	// sheet (rx can't emit an interrupt while in HALT mode.
+	REG_HIGH(CR2, PIN_RX);
+
+	// Turn off the running indicator
+	LOW(PIN_LED_PCB);
+
+	// We may wake up because of start bit on UART line, meaning
+	// the first byte hasn't been yet received. Ensuring that
+	// we'll stay awake until the end of first byte at minimum.
+	snooze_suppressor = MINIMUM_WAKEUP_MS;
+
+	halt();
+
+	// WAKE UP!! Rise and shine! Interrupts are automatically
+	// enabled on wake-up, so suppressing them again. In case of
+	// serial traffic, int_on_portd() has been already called
+	// before getting here because it's impossible to wake up
+	// without going to interrupt handlers.
+	sim();
+
+	// Suppress future spurious calls to int_on_portd()
+	REG_LOW(CR2, PIN_RX);
+
+	// Re-enable interrupts
+	rim();
+}
 
 bool uart1_baudrate(uint16_t rate) {
 	// Divide cpu freq with baud rate, rounding to nearest.
@@ -136,23 +181,7 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 
 	// If we don't have any ongoing tasks, prepare for a halt.
 	if (sleepy) {
-		// Enable serial interrupts to wake up from serial ("unreal")
-		REG_HIGH(CR2, PIN_RX);
-
-		// Turn off the running indicator and halt the whole CPU.
-		LOW(PIN_LED_PCB);
-		halt();
-
-		// WAKE UP!! Rise and shine!
-
-		// Suppress double interrupts on serial activity
-		REG_LOW(CR2, PIN_RX);
-
-		// We might have woken up because of start bit on UART
-		// line, meaning the first byte hasn't been yet
-		// received. We have to stay awake until we know if we
-		// receive any.
-		snooze_suppressor = MINIMUM_WAKEUP_MS;
+		should_halt = true;
 	}
 }
 
@@ -181,12 +210,8 @@ int main(void)
 	REG_HIGH(CR2, PIN_IN3);
 	REG_HIGH(CR2, PIN_IN4);
 
-	// "Unreal mode" for serial traffic. Enable interrupt for the
-	// serial pin and it magically wakes up after serial activity,
-	// although this shouldn't be possible according to STM8S data
-	// sheet (rx can't emit an interrupt while in HALT mode.
+	// Serial port has an external pull-up, no need to put CR1 on.
 	REG_LOW(CR1, PIN_RX); // We have external pull-up
-	REG_HIGH(CR2, PIN_RX); // Enable interrupts
 
 	// MOSFET controls and LEDs are push-pull outputs
 	// (CR1 already set)
@@ -197,9 +222,9 @@ int main(void)
 	OUTPUT(PIN_OUT2);
 	OUTPUT(PIN_OUT3);
 
-	// Interrupts on rising/falling edge on PORTC. TODO
-	// change this if inputs are somewhere else!
-	EXTI_CR1 |= 0x30;
+	// Interrupts on rising/falling edge on PORTC and PORTD.
+	// NOTE: change this if inputs are somewhere else!
+	EXTI_CR1 |= 0xf0;
 
 	// Timer configuration
 	// Prescaler register: 2MHz/2^4 = 125 kHz
@@ -233,5 +258,6 @@ int main(void)
 	// Stay in light sleep to keep timers going (unless halted in interrupt)
 	while (true) {
 		wfi();
+		maybe_halt();
 	}
 }
