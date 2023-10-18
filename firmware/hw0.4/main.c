@@ -180,9 +180,7 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 	}
 
 	// If we don't have any ongoing tasks, prepare for a halt.
-	if (sleepy) {
-		should_halt = true;
-	}
+	should_halt = sleepy;
 }
 
 int main(void)
