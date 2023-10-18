@@ -30,9 +30,9 @@
 // to avoid oscillation in case of a boot loop.
 static volatile uint16_t ctrl_debounce = STARTUP_DEBOUNCE_MS;
 
-// Stay awake for a while to get full byte from serial before
-// sleeping again.
-static volatile uint16_t snooze_suppressor = SERIAL_KEEPALIVE_MS;
+// Used to postpone sleeping for any reason, including waiting for
+// serial traffic.
+static volatile uint16_t snooze_suppressor = 0;
 
 // A global flag for carrying state from ISR to main loop
 static volatile bool should_halt = false;
