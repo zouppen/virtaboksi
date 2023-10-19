@@ -1,4 +1,4 @@
-/* Firmware for Virtaboksi v0.4 */
+/* Firmware for Virtaboksi v0.4 and above */
 #include <stdint.h>
 #include <stdbool.h>
 #include <stm8.h>
@@ -246,9 +246,8 @@ int main(void)
 	OUTPUT(PIN_OUT2);
 	OUTPUT(PIN_OUT3);
 
-	// Interrupts on rising/falling edge on PORTC and PORTD.
-	// NOTE: change this if inputs are somewhere else!
-	EXTI_CR1 |= 0xf0;
+	// Interrupts are board specific and defined in pins.h.
+	EXTI_CR1 |= BOARD_EXTI_CR1;
 
 	// Timer configuration
 	// Prescaler register: 2MHz/2^4 = 125 kHz

@@ -1,6 +1,6 @@
 #pragma once
 
-// Pin configuration for board version 0.4
+// Board version 0.4 configuration
 #ifdef BOARD_0_4
 #define PIN_IN1       PC,7
 #define PIN_IN2       PC,6
@@ -14,6 +14,9 @@
 #define PIN_OUT3      PC,3
 #define PIN_LED_PCB   PD,1
 #define PIN_TX_EN     PD,2,3
+
+// Interruptable pins are on PORTC and PORTB
+#define BOARD_EXTI_CR1 (EXTI_CR1_C_BOTH | EXTI_CR1_D_BOTH)
 #endif
 
 // Constant pins for STM8S003
