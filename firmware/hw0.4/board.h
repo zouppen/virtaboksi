@@ -17,6 +17,12 @@
 
 // Interruptable pins are on PORTC and PORTB
 #define BOARD_EXTI_CR1 (EXTI_CR1_C_BOTH | EXTI_CR1_D_BOTH)
+
+// IREF is not present on this board
+#define BOARD_IREF_CONF
+#define BOARD_IREF_ON
+#define BOARD_IREF_OFF
+
 #else
 #error Unknown board version.
 #endif

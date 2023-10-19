@@ -1,6 +1,7 @@
 /* Firmware for Virtaboksi v0.4 and above */
 #include <stm8.h>
 #include "board.h"
+#include "iref.h"
 #include "util.h"
 
 #define DEBOUNCE_MS 200
@@ -44,6 +45,9 @@ static void controlled_halt(void)
 	// we'll stay awake until the end of first byte at minimum.
 	snooze_suppressor = MINIMUM_WAKEUP_MS;
 
+	// Put IREF to powersave if no LEDs are lit
+	iref_maybe_off();
+
 	halt();
 
 	// WAKE UP!! Rise and shine! Interrupts are automatically
@@ -55,6 +59,9 @@ static void controlled_halt(void)
 
 	// Suppress future spurious calls to int_on_portd()
 	REG_LOW(CR2, PIN_RX);
+
+	// Put IREF on while we stay awake
+	iref_on();
 
 	// Re-enable interrupts
 	rim();
@@ -219,6 +226,10 @@ int main(void)
 	OUTPUT(PIN_OUT1);
 	OUTPUT(PIN_OUT2);
 	OUTPUT(PIN_OUT3);
+
+	// Must be on before LEDs are controlled
+	BOARD_IREF_CONF;
+	iref_on();
 
 	// Interrupts are board specific and defined in board.h.
 	EXTI_CR1 |= BOARD_EXTI_CR1;
