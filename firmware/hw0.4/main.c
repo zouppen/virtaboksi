@@ -193,7 +193,8 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 
 int main(void)
 {
-	// Not changing clock speed, running on default of 2 MHz
+	// Setting clock speed
+	stm8_configure_clock();
 
 	// As suggested in chapter 11.5 of RM0016, unused pins are set
 	// to pull-up state. We make them all pull-up first, it's safe.

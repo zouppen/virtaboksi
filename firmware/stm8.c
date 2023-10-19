@@ -16,3 +16,12 @@ bool stm8_uart1_baudrate(uint16_t rate)
 
 	return true;
 }
+
+void stm8_configure_clock(void)
+{
+#if F_CPU == 2000000
+	// Not changing clock speed, running on default of 2 MHz
+#else
+#error No support for this CPU frequency. FIXME by editing stm8.c
+#endif
+}

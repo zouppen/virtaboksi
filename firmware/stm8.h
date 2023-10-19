@@ -7,6 +7,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// Configure clock based on F_CPU.
+void stm8_configure_clock(void);
+
 // Set UART1 baud rate based on F_CPU. Returns false in case of an
 // invalid value.
 bool stm8_uart1_baudrate(uint16_t rate);
