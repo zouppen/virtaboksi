@@ -7,28 +7,32 @@
 // MACROS FOR EASY PIN HANDLING FOR ATMEL GCC-AVR, adapted to STM8
 // From https://stackoverflow.com/a/25986570/514723
 
-#define _BV(bit) (1U << (bit))
+// Overloaded macro hack from
+// https://stackoverflow.com/questions/11761703/overloading-macro-on-number-of-arguments
+#define _BV_GET_MACRO(_1,_2,NAME,...) NAME
+#define _BV(...) _BV_GET_MACRO(__VA_ARGS__, _BV2, _BV1)(__VA_ARGS__)
+
+// Macros for bit fields depending on bit count
+#define _BV1(bit) (1U << (bit))
+#define _BV2(bit_a, bit_b) ((1U << (bit_a)) | (1U << (bit_b)))
 
 // These macros are used indirectly by other macros.
-#define _SET(type,name,bit)          name##_##type |= _BV(bit)
-#define _CLEAR(type,name,bit)        name##_##type &= ~ _BV(bit)
-#define _TOGGLE(type,name,bit)       name##_##type ^= _BV(bit)
-#define _GET(type,name,bit)          ((name##_##type >> bit) &  1)
+#define _SET(type,name,...)          name##_##type |= _BV(__VA_ARGS__)
+#define _CLEAR(type,name,...)        name##_##type &= ~ _BV(__VA_ARGS__)
+#define _TOGGLE(type,name,...)       name##_##type ^= _BV(__VA_ARGS__)
+#define _GET(type,name,bit_a,...)    ((name##_##type >> bit_a) &  1)
 #define _PUT(type,name,bit,value)    name##_##type = ( name##_##type & ( ~ _BV(bit)) ) | ( ( 1 & (unsigned char)value ) << bit )
 
 // These macros are used by end user.
-#define OUTPUT(pin)         _SET(DDR,pin)
-#define INPUT(pin)          _CLEAR(DDR,pin)
-#define HIGH(pin)           _SET(ODR,pin)
-#define LOW(pin)            _CLEAR(ODR,pin)
-#define TOGGLE(pin)         _TOGGLE(ODR,pin)
-#define READ(pin)           _GET(IDR,pin)
-#define STATE(pin)          _GET(ODR,pin)
-#define REG_HIGH(reg,pin)   _SET(reg,pin)
-#define REG_LOW(reg,pin)    _CLEAR(reg,pin)
-
-// Constant pins for STM8S003
-#define PIN_RX PD,6
+#define OUTPUT(...)         _SET(DDR,__VA_ARGS__)
+#define INPUT(...)          _CLEAR(DDR,__VA_ARGS__)
+#define HIGH(...)           _SET(ODR,__VA_ARGS__)
+#define LOW(...)            _CLEAR(ODR,__VA_ARGS__)
+#define TOGGLE(...)         _TOGGLE(ODR,__VA_ARGS__)
+#define READ(...)           _GET(IDR,__VA_ARGS__)
+#define STATE(...)          _GET(ODR,__VA_ARGS__)
+#define REG_HIGH(reg,...)   _SET(reg,__VA_ARGS__)
+#define REG_LOW(reg,...)    _CLEAR(reg,__VA_ARGS__)
 
 /* Register addresses */
 

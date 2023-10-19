@@ -137,8 +137,7 @@ void uart_rx(void) __interrupt(UART1_RX)
 		uint8_t const out = rot13(chr);
 
 		// Enable RS-485
-		HIGH(PIN_TX_EN1);
-		HIGH(PIN_TX_EN2);
+		HIGH(PIN_TX_EN);
 
 		// Transmit first byte and enable interrupt to send
 		// more later.
@@ -165,8 +164,7 @@ void uart_tx(void) __interrupt(UART1_TX)
 		UART1_CR2 &= ~UART_CR2_TCIEN; // Do not notify more
 
 		// Turn off RS-485 transmitter
-		LOW(PIN_TX_EN1);
-		LOW(PIN_TX_EN2);
+		LOW(PIN_TX_EN);
 	}
 }
 
@@ -205,7 +203,7 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
 	}
 
 	// If transmitting, no sleep
-	sleepy = sleepy && !STATE(PIN_TX_EN1);
+	sleepy = sleepy && !STATE(PIN_TX_EN);
 
 	// If we don't have any ongoing tasks, prepare for a halt.
 	may_halt = sleepy;
@@ -272,10 +270,8 @@ int main(void)
 	uart1_baudrate(9600);
 
 	// Turn on rs485 rx and put to receive mode
-	OUTPUT(PIN_TX_EN1);
-	OUTPUT(PIN_TX_EN2);
-	LOW(PIN_TX_EN1);
-	LOW(PIN_TX_EN2);
+	OUTPUT(PIN_TX_EN);
+	LOW(PIN_TX_EN);
 
 	// Enabling interrupts should be the last part of
 	// initialization.

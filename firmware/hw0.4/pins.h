@@ -13,8 +13,7 @@
 #define PIN_OUT2      PB,5
 #define PIN_OUT3      PC,3
 #define PIN_LED_PCB   PD,1
-#define PIN_TX_EN1    PD,2
-#define PIN_TX_EN2    PD,3
+#define PIN_TX_EN     PD,2,3
 #endif
 
 // Constant pins for STM8S003
