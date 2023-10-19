@@ -303,6 +303,8 @@
 #define EXTI_CR1 *(volatile uint8_t *)0x50A0
 #define EXTI_CR2 *(volatile uint8_t *)0x50A1
 
+#define EXTI_CR1_A_BOTH 0b00000011
+#define EXTI_CR1_B_BOTH 0b00001100
 #define EXTI_CR1_C_BOTH 0b00110000
 #define EXTI_CR1_D_BOTH 0b11000000
 
