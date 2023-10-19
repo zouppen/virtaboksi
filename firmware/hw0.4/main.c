@@ -1,7 +1,7 @@
 /* Firmware for Virtaboksi v0.4 */
 #include <stdint.h>
 #include <stdbool.h>
-#include "stm8.h"
+#include <stm8.h>
 
 #define DEBOUNCE_MS 200
 #define STARTUP_DEBOUNCE_MS 500
@@ -22,9 +22,6 @@
 #define PIN_LED_PCB   PD,1
 #define PIN_TX_EN1    PD,2
 #define PIN_TX_EN2    PD,3
-
-// Non-configurable (MCU specific)
-#define PIN_RX        PD,6
 
 // On bootup, have a small pause after bootup before switching loads,
 // to avoid oscillation in case of a boot loop.
@@ -147,7 +144,7 @@ void uart_rx(void) __interrupt(UART1_RX)
 		// Reading the byte also clears the RXNE flag
 		uint8_t const chr = UART1_DR;
 
-		// Keep CPU running
+		// Keep CPU running until we've received a whole message
 		snooze_suppressor = SERIAL_KEEPALIVE_MS;
 
 		// Funny little test

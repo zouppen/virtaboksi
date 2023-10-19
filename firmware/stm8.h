@@ -27,6 +27,9 @@
 #define REG_HIGH(reg,pin)   _SET(reg,pin)
 #define REG_LOW(reg,pin)    _CLEAR(reg,pin)
 
+// Constant pins for STM8S003
+#define PIN_RX PD,6
+
 /* Register addresses */
 
 /* Clock */
