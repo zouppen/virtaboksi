@@ -19,11 +19,11 @@ static volatile uint16_t snooze_suppressor = 0;
 // A global flag for carrying state from ISR to main loop
 static volatile bool may_halt = false;
 
-void controlled_halt(void);
-void update_outputs(void);
+static void controlled_halt(void);
+static void update_outputs(void);
 
 // Halts CPU. This must be called outside of interrupt handlers.
-void controlled_halt(void)
+static void controlled_halt(void)
 {
 	// Must not go to interrupts while preparing halt()
 	sim();
@@ -60,7 +60,7 @@ void controlled_halt(void)
 	rim();
 }
 
-void update_outputs(void) {
+static void update_outputs(void) {
 	bool const sw_away = !READ(PIN_IN1);
 	bool const sw_home = !READ(PIN_IN2);
 	bool const bat_good = READ(PIN_IN3);
