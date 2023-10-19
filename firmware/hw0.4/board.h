@@ -17,6 +17,8 @@
 
 // Interruptable pins are on PORTC and PORTB
 #define BOARD_EXTI_CR1 (EXTI_CR1_C_BOTH | EXTI_CR1_D_BOTH)
+#else
+#error Unknown board version.
 #endif
 
 // Constant pins for STM8S003
