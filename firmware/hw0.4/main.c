@@ -2,26 +2,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stm8.h>
+#include "pins.h"
 
 #define DEBOUNCE_MS 200
 #define STARTUP_DEBOUNCE_MS 500
 #define MINIMUM_WAKEUP_MS 100
 #define SERIAL_KEEPALIVE_MS 1000
-
-// Pin configuration (Board version specific)
-#define PIN_IN1       PC,7
-#define PIN_IN2       PC,6
-#define PIN_IN3       PC,5
-#define PIN_IN4       PC,4
-#define PIN_GROUP1    PD,4
-#define PIN_GROUP2    PA,3
-#define PIN_GROUP3    PA,2
-#define PIN_OUT1      PB,4
-#define PIN_OUT2      PB,5
-#define PIN_OUT3      PC,3
-#define PIN_LED_PCB   PD,1
-#define PIN_TX_EN1    PD,2
-#define PIN_TX_EN2    PD,3
 
 // On bootup, have a small pause after bootup before switching loads,
 // to avoid oscillation in case of a boot loop.
