@@ -4,6 +4,13 @@
  */
 #pragma once
 
+#include <stdbool.h>
+#include <stdint.h>
+
+// Set UART1 baud rate based on F_CPU. Returns false in case of an
+// invalid value.
+bool stm8_uart1_baudrate(uint16_t rate);
+
 // MACROS FOR EASY PIN HANDLING FOR ATMEL GCC-AVR, adapted to STM8
 // From https://stackoverflow.com/a/25986570/514723
 

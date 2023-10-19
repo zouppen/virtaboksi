@@ -1,6 +1,4 @@
 /* Firmware for Virtaboksi v0.4 and above */
-#include <stdint.h>
-#include <stdbool.h>
 #include <stm8.h>
 #include "board.h"
 
@@ -22,7 +20,6 @@ static volatile bool may_halt = false;
 
 uint8_t rot13(uint8_t c);
 void controlled_halt(void);
-bool uart1_baudrate(uint16_t rate);
 void update_outputs(void);
 
 uint8_t rot13(uint8_t c)
@@ -70,21 +67,6 @@ void controlled_halt(void)
 
 	// Re-enable interrupts
 	rim();
-}
-
-bool uart1_baudrate(uint16_t rate) {
-	// Divide cpu freq with baud rate, rounding to nearest.
-	uint32_t const freq = 2000000;
-	uint32_t const div = (freq + (rate >> 1))/rate;
-
-	if (div > 0xffff) return false;
-	if (div < 16) return false;
-
-	// Pick up nibbles and write in correct order (BRR2 first)
-	UART1_BRR2 = ((div & 0xf000) >> 8) | (div & 0x000f);
-	UART1_BRR1 = (div & 0x0ff0) >> 4;
-
-	return true;
 }
 
 void update_outputs(void) {
@@ -266,7 +248,7 @@ int main(void)
 		UART_CR2_REN |   // Receiver enable
 		UART_CR2_RIEN;   // Receiver interrupt enabled
 	UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
-	uart1_baudrate(9600);
+	stm8_uart1_baudrate(9600);
 
 	// Turn on rs485 rx and put to receive mode
 	OUTPUT(PIN_TX_EN);
