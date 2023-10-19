@@ -14,7 +14,7 @@ HEADERS=$(wildcard *.h $(COMMONDIR)/*.h)
 CC = sdcc
 PROGRAMMER = stlinkv2
 
-DEFINES=
+DEFINES=-DBOARD_0_4
 ## Set MCU-type DEFINE
 ifeq ($(DEVICE),stm8s003f3)
     DEFINES += -DSTM8S003

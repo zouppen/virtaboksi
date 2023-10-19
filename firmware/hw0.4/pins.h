@@ -1,6 +1,7 @@
 #pragma once
 
 // Pin configuration for board version 0.4
+#ifdef BOARD_0_4
 #define PIN_IN1       PC,7
 #define PIN_IN2       PC,6
 #define PIN_IN3       PC,5
@@ -14,6 +15,7 @@
 #define PIN_LED_PCB   PD,1
 #define PIN_TX_EN1    PD,2
 #define PIN_TX_EN2    PD,3
+#endif
 
 // Constant pins for STM8S003
 #define PIN_RX        PD,6
