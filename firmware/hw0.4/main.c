@@ -79,18 +79,18 @@ static void update_outputs(void) {
 		LOW(PIN_GROUP2);
 		LOW(PIN_GROUP3);
 		// Indicator LEDs
-		HIGH(PIN_OUT1);
-		HIGH(PIN_OUT2);
-		LOW(PIN_OUT3);
+		LOW(PIN_OUT1);
+		LOW(PIN_OUT2);
+		HIGH(PIN_OUT3);
 	} else if (sw_home) {
 		// Home: All outputs on
 		HIGH(PIN_GROUP1);
 		HIGH(PIN_GROUP2);
 		HIGH(PIN_GROUP3);
 		// Indicator LEDs
-		HIGH(PIN_OUT1);
-		LOW(PIN_OUT2);
-		HIGH(PIN_OUT3);
+		LOW(PIN_OUT1);
+		HIGH(PIN_OUT2);
+		LOW(PIN_OUT3);
 	} else {
 		// Away: PRI on
 		HIGH(PIN_GROUP1);
@@ -98,8 +98,8 @@ static void update_outputs(void) {
 		LOW(PIN_GROUP3);
 		// Indicator LEDs
 		LOW(PIN_OUT1);
-		HIGH(PIN_OUT2);
-		HIGH(PIN_OUT3);
+		LOW(PIN_OUT2);
+		LOW(PIN_OUT3);
 	}
 }
 
