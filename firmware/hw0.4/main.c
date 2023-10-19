@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stm8.h>
-#include "pins.h"
+#include "board.h"
 
 #define DEBOUNCE_MS 200
 #define STARTUP_DEBOUNCE_MS 500
@@ -246,7 +246,7 @@ int main(void)
 	OUTPUT(PIN_OUT2);
 	OUTPUT(PIN_OUT3);
 
-	// Interrupts are board specific and defined in pins.h.
+	// Interrupts are board specific and defined in board.h.
 	EXTI_CR1 |= BOARD_EXTI_CR1;
 
 	// Timer configuration
