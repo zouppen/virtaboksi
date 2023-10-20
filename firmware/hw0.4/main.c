@@ -20,6 +20,14 @@ static volatile uint16_t snooze_suppressor = 0;
 // A global flag for carrying state from ISR to main loop
 static volatile bool may_halt = false;
 
+// These are handled inside ISRs only so no need to make them
+// volatile.
+#define SERIAL_BUF_SIZE 80
+static uint8_t serial_buf[SERIAL_BUF_SIZE];
+static uint8_t *serial_rx_p = serial_buf;
+static const uint8_t *serial_tx_p = serial_buf;
+static void *serial_tx_end; // Indicator when to stop sending
+
 static void controlled_halt(void);
 static void update_outputs(void);
 
@@ -114,37 +122,61 @@ void uart_rx(void) __interrupt(UART1_RX)
 		snooze_suppressor = SERIAL_KEEPALIVE_MS;
 
 		// Funny little test
-		uint8_t const out = util_rot13(chr);
+		if (chr == '\r') {
+			// Terminate string
+			*serial_rx_p++ = '\r';
+			*serial_rx_p++ = '\n';
 
-		// Enable RS-485
-		HIGH(PIN_TX_EN);
+			// Reset buffers
+			serial_tx_end = serial_rx_p;
+			serial_tx_p = serial_buf;
+			serial_rx_p = serial_buf;
 
-		// Transmit first byte and enable interrupt to send
-		// more later.
-		UART1_DR = out;
-		UART1_CR2 |= UART_CR2_TIEN;
+			// Make sure transfer complete interrupt is off.
+			UART1_CR2 &= ~UART_CR2_TCIEN;
+
+			// Enable RS-485
+			HIGH(PIN_TX_EN);
+
+			// Enable interrupt to suck the data from tx buffer
+			UART1_CR2 |= UART_CR2_TIEN;
+		} else if (serial_rx_p == serial_buf + SERIAL_BUF_SIZE - 2) {
+			// Buffer overflow. Ignore byte.
+		} else {
+			// Have some fun by running rot13 on input
+			*serial_rx_p++ = util_rot13(chr);
+		}
 	}
 }
 
 void uart_tx(void) __interrupt(UART1_TX)
 {
-	// Serial transmit buffer empty
-	if (UART1_SR & UART_SR_TXE) {
-		// Check if want to transmit more
-		// TODO
+	// Since we share the same interrupt, we have to have a state
+	// for the send and finish conditions.
+	if (serial_tx_p < serial_tx_end) {
+		// Can we yet send?
+		if (UART1_SR & UART_SR_TXE) {
 
-		// Our transmit buffer is empty, do not come here
-		// again and wait enable the TX ready interrupt
-		UART1_CR2 ^= UART_CR2_TIEN | UART_CR2_TCIEN;
-	}
+			// Check if want to transmit more
+			uint8_t const out = *serial_tx_p++;
+			if (serial_tx_p == serial_tx_end) {
+				// Do not come here again and wait enable the
+				// TX ready interrupt.
+				UART1_CR2 ^= UART_CR2_TIEN | UART_CR2_TCIEN;
+			}
 
-	// Serial transmit finished
-	if (UART1_SR & UART_SR_TC) {
-		// Transmit finished
-		UART1_CR2 &= ~UART_CR2_TCIEN; // Do not notify more
+			// Send byte
+			UART1_DR = out;
+		}
+	} else {
+		// Is the last byte already finished
+		if (UART1_SR & UART_SR_TC) {
+			// Transmit finished. Flip bits to disable TCIEN
+			UART1_CR2 ^= UART_CR2_TCIEN;
 
-		// Turn off RS-485 transmitter
-		LOW(PIN_TX_EN);
+			// Turn off RS-485 transmitter
+			LOW(PIN_TX_EN);
+		}
 	}
 }
 
