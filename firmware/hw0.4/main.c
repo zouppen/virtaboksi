@@ -132,9 +132,6 @@ void uart_rx(void) __interrupt(UART1_RX)
 			serial_tx_p = serial_buf;
 			serial_rx_p = serial_buf;
 
-			// Make sure transfer complete interrupt is off.
-			UART1_CR2 &= ~UART_CR2_TCIEN;
-
 			// Enable RS-485
 			HIGH(PIN_TX_EN);
 
@@ -171,8 +168,8 @@ void uart_tx(void) __interrupt(UART1_TX)
 	} else {
 		// Is the last byte already finished
 		if (UART1_SR & UART_SR_TC) {
-			// Transmit finished. Flip bits to disable TCIEN
-			UART1_CR2 ^= UART_CR2_TCIEN;
+			// Transmit finished. Disable TCIEN
+			UART1_CR2 &= ~UART_CR2_TCIEN;
 
 			// Turn off RS-485 transmitter
 			LOW(PIN_TX_EN);
