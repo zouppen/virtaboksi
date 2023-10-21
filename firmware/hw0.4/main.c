@@ -261,7 +261,7 @@ int main(void)
 	iref_on();
 
 	// Interrupts are board specific and defined in board.h.
-	EXTI_CR1 |= BOARD_EXTI_CR1;
+	EXTI_CR1 = BOARD_EXTI_CR1;
 
 	// Timer configuration
 	// Prescaler register: 2MHz/2^4 = 125 kHz
@@ -270,16 +270,16 @@ int main(void)
 	TIM2_ARRH = 0;
 	TIM2_ARRL = 125;
 	// Interrupt Enable Register, Update interrupt (UIE)
-	TIM2_IER |= TIM_IER_UIE;
+	TIM2_IER = TIM_IER_UIE;
 	// Control Register 1, Counter ENable bit (CEN)
-	TIM2_CR1 |= TIM_CR1_CEN;
+	TIM2_CR1 = TIM_CR1_CEN;
 
 	// UART configuration
-	UART1_CR2 |=
+	UART1_CR2 =
 		UART_CR2_TEN |   // Enable TX
 		UART_CR2_REN |   // Receiver enable
 		UART_CR2_RIEN;   // Receiver interrupt enabled
-	UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
+	// UART1_CR3 default is 1 stop bit
 	stm8_uart1_baudrate(9600);
 
 	// Turn on rs485 rx and put to receive mode
