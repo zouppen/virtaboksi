@@ -43,3 +43,4 @@ clean:
 flash: $(PROGRAM).ihx
 	stm8flash -c $(PROGRAMMER) -p $(DEVICE) -w $(PROGRAM).ihx
 	stm8flash -c $(PROGRAMMER) -p $(DEVICE) -v $(PROGRAM).ihx
+	stm8flash -c $(PROGRAMMER) -p $(DEVICE) -R
