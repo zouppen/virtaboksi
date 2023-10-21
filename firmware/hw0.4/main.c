@@ -63,16 +63,13 @@ static void controlled_halt(void)
 	// serial traffic, int_on_portd() has been already called
 	// before getting here because it's impossible to wake up
 	// without going to interrupt handlers.
-	sim();
+	__critical {
+		// Suppress future spurious calls to int_on_portd()
+		REG_LOW(CR2, PIN_RX);
 
-	// Suppress future spurious calls to int_on_portd()
-	REG_LOW(CR2, PIN_RX);
-
-	// Put IREF on while we stay awake
-	iref_on();
-
-	// Re-enable interrupts
-	rim();
+		// Put IREF on while we stay awake
+		iref_on();
+	}
 }
 
 static void update_outputs(void) {
