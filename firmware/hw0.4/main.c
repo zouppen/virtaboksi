@@ -73,7 +73,8 @@ static void controlled_halt(void)
 	}
 }
 
-static void update_outputs(void) {
+static void update_outputs(void)
+{
 	bool const sw_away = !READ(PIN_IN1);
 	bool const sw_home = !READ(PIN_IN2);
 	bool const bat_good = READ(PIN_IN3);
@@ -171,16 +172,19 @@ void uart_tx(void) __interrupt(UART1_TX)
 	}
 }
 
-void int_on_portc(void) __interrupt(EXTI2_IRQ) {
+void int_on_portc(void) __interrupt(EXTI2_IRQ)
+{
 	ctrl_debounce = DEBOUNCE_MS;
 }
 
-void int_on_portd(void) __interrupt(EXTI3_IRQ) {
+void int_on_portd(void) __interrupt(EXTI3_IRQ)
+{
 	// OBS! When we wake up from serial activity, we get here once
 	// and it's inevitable.
 }
 
-void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ) {
+void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ)
+{
 	// Clear Timer 2 Status Register 1 Update Interrupt Flag (UIF)
 	TIM2_SR1 &= ~TIM_SR1_UIF;
 
