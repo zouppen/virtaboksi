@@ -86,7 +86,6 @@ static void update_outputs(void) {
 		// Indicator LEDs
 		LOW(PIN_OUT1);
 		LOW(PIN_OUT2);
-		HIGH(PIN_OUT3);
 	} else if (sw_home) {
 		// Home: All outputs on
 		HIGH(PIN_GROUP1);
@@ -95,16 +94,14 @@ static void update_outputs(void) {
 		// Indicator LEDs
 		LOW(PIN_OUT1);
 		HIGH(PIN_OUT2);
-		LOW(PIN_OUT3);
 	} else {
 		// Away: PRI on
 		HIGH(PIN_GROUP1);
 		LOW(PIN_GROUP2);
 		LOW(PIN_GROUP3);
 		// Indicator LEDs
-		LOW(PIN_OUT1);
+	        HIGH(PIN_OUT1);
 		LOW(PIN_OUT2);
-		LOW(PIN_OUT3);
 	}
 }
 
@@ -150,7 +147,6 @@ void uart_tx(void) __interrupt(UART1_TX)
 	if (serial_tx_p < serial_tx_end) {
 		// Can we yet send?
 		if (UART1_SR & UART_SR_TXE) {
-
 			// Check if want to transmit more
 			uint8_t const out = *serial_tx_p++;
 			if (serial_tx_p == serial_tx_end) {
