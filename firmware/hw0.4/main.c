@@ -271,17 +271,7 @@ int main(void)
 	// Control Register 1, Counter ENable bit (CEN)
 	TIM2_CR1 = TIM_CR1_CEN;
 
-	// UART configuration
-	UART1_CR2 =
-		UART_CR2_TEN |   // Enable TX
-		UART_CR2_REN |   // Receiver enable
-		UART_CR2_RIEN;   // Receiver interrupt enabled
-	// UART1_CR3 default is 1 stop bit
-	stm8_uart1_baudrate(9600);
-
-	// Turn on rs485 rx and put to receive mode
-	OUTPUT(PIN_TX_EN);
-	LOW(PIN_TX_EN);
+	serial_init();
 
 	// Enabling interrupts should be the last part of
 	// initialization.
