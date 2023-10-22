@@ -18,7 +18,7 @@ static volatile uint16_t ctrl_debounce = STARTUP_DEBOUNCE_MS;
 static volatile uint16_t snooze_suppressor = 0;
 
 // A global flag for carrying state from ISR to main loop
-static volatile bool may_halt = false;
+static volatile bool timers_running = true;
 
 // These are handled inside ISRs only so no need to make them
 // volatile.
@@ -38,8 +38,6 @@ static void controlled_halt(void)
 	// Must not go to interrupts while preparing halt()
 	sim();
 
-	may_halt = false;
-
 	// "Unreal mode" for serial traffic. Enable interrupt for the
 	// serial pin and it magically wakes up after serial activity,
 	// although this shouldn't be possible according to STM8S data
@@ -53,6 +51,7 @@ static void controlled_halt(void)
 	// the first byte hasn't been yet received. Ensuring that
 	// we'll stay awake until the end of first byte at minimum.
 	snooze_suppressor = MINIMUM_WAKEUP_MS;
+	timers_running = true;
 
 	// Put IREF to powersave if no LEDs are lit
 	iref_maybe_off();
@@ -191,12 +190,14 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ)
 	// Blink the LED when in operation
 	TOGGLE(PIN_LED_PCB);
 
-	bool sleepy = true;
+	// This is an optimization, can keep in register until end of
+	// this function.
+	bool running = false;
 
 	// Debounce countdown
 	if (ctrl_debounce) {
 		if (--ctrl_debounce) {
-			sleepy = false;
+			running = true;
 		} else {
 			update_outputs();
 		}
@@ -205,15 +206,12 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ)
 	// Serial runtime counter
 	if (snooze_suppressor) {
 		if (--snooze_suppressor) {
-			sleepy = false;
+			running = true;
 		}
 	}
 
-	// If transmitting, no sleep
-	sleepy = sleepy && !STATE(PIN_TX_EN);
-
-	// If we don't have any ongoing tasks, prepare for a halt.
-	may_halt = sleepy;
+	// Update the global flag to indicate readiness for a sleep.
+	timers_running = running || STATE(PIN_TX_EN);;
 }
 
 int main(void)
@@ -293,7 +291,7 @@ int main(void)
 	while (true) {
 		loop();
 
-		if (may_halt) {
+		if (!timers_running) {
 			controlled_halt();
 		} else {
 			wfi();
