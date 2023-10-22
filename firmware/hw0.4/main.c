@@ -30,6 +30,7 @@ static void *serial_tx_end; // Indicator when to stop sending
 
 static void controlled_halt(void);
 static void update_outputs(void);
+static void loop(void);
 
 // Halts CPU. This must be called outside of interrupt handlers.
 static void controlled_halt(void)
@@ -286,10 +287,18 @@ int main(void)
 	// Stay in light sleep to keep timers going. If nothing to
 	// run, go to halt mode.
 	while (true) {
+		loop();
+
 		if (may_halt) {
 			controlled_halt();
 		} else {
 			wfi();
 		}
 	}
+}
+
+// Run after waking up from the interrupts. Can be used to
+// perform longer duration tasks. Interrupts are enabled.
+static void loop(void)
+{
 }
