@@ -211,7 +211,7 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ)
 	}
 
 	// Update the global flag to indicate readiness for a sleep.
-	timers_running = running || STATE(PIN_TX_EN);;
+	timers_running = running;
 }
 
 int main(void)
@@ -291,7 +291,7 @@ int main(void)
 	while (true) {
 		loop();
 
-		if (!timers_running) {
+		if (!timers_running && !STATE(PIN_TX_EN)) {
 			controlled_halt();
 		} else {
 			wfi();
