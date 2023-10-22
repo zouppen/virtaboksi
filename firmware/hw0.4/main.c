@@ -3,6 +3,7 @@
 #include "board.h"
 #include "iref.h"
 #include "util.h"
+#include "serial.h"
 
 #define DEBOUNCE_MS 200
 #define STARTUP_DEBOUNCE_MS 500
@@ -291,7 +292,7 @@ int main(void)
 	while (true) {
 		loop();
 
-		if (!timers_running && !STATE(PIN_TX_EN)) {
+		if (!timers_running && !serial_is_transmitting()) {
 			controlled_halt();
 		} else {
 			wfi();
