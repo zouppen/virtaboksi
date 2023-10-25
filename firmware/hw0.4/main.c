@@ -5,12 +5,8 @@
 #include "iref.h"
 #include "util.h"
 #include "serial.h"
+#include "timers.h"
 
-#define DEBOUNCE_MS 200
-#define STARTUP_DEBOUNCE_MS 500
-#define PANIC_OFF_MS 1000
-#define MINIMUM_WAKEUP_MS 100
-#define SERIAL_KEEPALIVE_MS 1000
 #define HALT_ENABLED
 
 // On bootup, have a small pause after bootup before switching loads,
@@ -20,10 +16,6 @@ static volatile uint16_t ctrl_debounce = STARTUP_DEBOUNCE_MS;
 // In case excessive flipflopping, turn all outputs off since it might
 // be an indicator of a hardware error.
 static volatile uint16_t ctrl_panic = PANIC_OFF_MS;
-
-// Used to postpone sleeping for any reason, including waiting for
-// serial traffic.
-static volatile uint16_t snooze_suppressor = 0;
 
 // A global flag for carrying state from ISR to main loop
 static volatile bool timers_running = true;
@@ -38,6 +30,7 @@ static uint8_t *serial_rx_p = serial_rx;
 static void controlled_halt(void);
 static void update_outputs(bool const panic);
 static void debounce_arm(void);
+static bool debounce_tick(void);
 static void loop(void);
 
 // Halts CPU. This must be called outside of interrupt handlers.
@@ -58,7 +51,7 @@ static void controlled_halt(void)
 	// We may wake up because of start bit on UART line, meaning
 	// the first byte hasn't been yet received. Ensuring that
 	// we'll stay awake until the end of first byte at minimum.
-	snooze_suppressor = MINIMUM_WAKEUP_MS;
+	timers_stay_awake(MINIMUM_WAKEUP_MS);
 	timers_running = true;
 
 	// Put IREF to powersave if no LEDs are lit
@@ -119,6 +112,24 @@ static void debounce_arm(void)
 	ctrl_debounce = DEBOUNCE_MS;
 }
 
+static bool debounce_tick(void)
+{
+	if (ctrl_debounce) {
+		if (--ctrl_debounce) {
+			// Still running
+			if (ctrl_panic && !--ctrl_panic) {
+				// Running for too long
+				update_outputs(true);
+			}
+			return true;
+		}
+		// Reached zero
+		ctrl_panic = PANIC_OFF_MS;
+		update_outputs(false);
+	}
+	return false;
+}
+
 void uart_rx(void) __interrupt(UART1_RX)
 {
 	// Cache values to avoid the register getting cleared. This
@@ -132,7 +143,7 @@ void uart_rx(void) __interrupt(UART1_RX)
 		// Incoming proper data
 
 		// Keep CPU running until we've received a whole message
-		snooze_suppressor = SERIAL_KEEPALIVE_MS;
+		timers_stay_awake(SERIAL_KEEPALIVE_MS);
 
 		serial_rx_activity();
 
@@ -175,39 +186,13 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ)
 	// Blink the LED when in operation
 	TOGGLE(PIN_LED_PCB);
 
-	// This is an optimization, can keep in register until end of
-	// this function.
-	bool running = false;
-
-	// Debounce countdown
-	if (ctrl_debounce) {
-		if (--ctrl_debounce) {
-			running = true;
-
-			// Panic condition countdown
-			if (ctrl_panic) {
-				if (!--ctrl_panic) {
-					update_outputs(true);
-				}
-			}
-		} else {
-			// Input is settled
-			ctrl_panic = PANIC_OFF_MS;
-			update_outputs(false);
-		}
-	}
-
-	// Serial runtime counter
-	if (snooze_suppressor) {
-		if (--snooze_suppressor) {
-			running = true;
-		}
-	}
-
+	// Process ticks
+	bool const debouncing = debounce_tick();
+	bool const ticking = timers_tick();
 	serial_tick();
 
 	// Update the global flag to indicate readiness for a sleep.
-	timers_running = running;
+	timers_running = debouncing || ticking;
 }
 
 int main(void)
