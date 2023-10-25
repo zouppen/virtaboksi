@@ -227,8 +227,8 @@ int main(void)
 	BOARD_IREF_CONF;
 	iref_on();
 
-	// Interrupts are board specific and defined in board.h.
-	EXTI_CR1 = BOARD_EXTI_CR1;
+	// Make interrupts trigger on both edges
+	EXTI_CR1 = 0xff;
 
 	// Timer configuration
 	// Prescaler register: 2MHz/2^4 = 125 kHz

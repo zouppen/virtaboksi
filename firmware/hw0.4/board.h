@@ -15,9 +15,6 @@
 #define PIN_LED_PCB   PD,1
 #define PIN_TX_EN     PD,2,3
 
-// Interruptable pins are on PORTC and PORTB
-#define BOARD_EXTI_CR1 (EXTI_CR1_C_BOTH | EXTI_CR1_D_BOTH)
-
 // IREF is not present on this board
 #define BOARD_IREF_CONF
 #define BOARD_IREF_ON
@@ -37,9 +34,6 @@
 #define PIN_OUT3      PC,3
 #define PIN_LED_PCB   PD,1
 #define PIN_TX_EN     PD,2
-
-// Interruptable pins are on PORTC and PORTB
-#define BOARD_EXTI_CR1 (EXTI_CR1_B_BOTH | EXTI_CR1_C_BOTH | EXTI_CR1_D_BOTH)
 
 // IREF is not present on this board
 #define BOARD_IREF_CONF  OUTPUT(PD,3)
