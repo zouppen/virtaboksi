@@ -10,7 +10,7 @@ char serial_tx[SERIAL_TX_LEN]; // Outgoing serial data
 static const uint8_t *serial_tx_p = serial_tx; // Pointer to tx position
 static volatile void *serial_tx_end; // Indicator when to stop sending
 static volatile bool tx_state = false; // Is tx start requested
-static volatile bool nul_terminated; // Flag for \0 terminated buffer
+static volatile bool tx_nul_terminated; // Flag for \0 terminated buffer
 static volatile uint16_t rx_cooldown_left = 0; // To avoid half-duplex clash
 
 // (Error) counters
@@ -82,10 +82,10 @@ static void may_send(buflen_t len) __critical
 		// char since when it's last char, the line is
 		// terminated anyway. This causes one read over buffer
 		// but nothing fatal. See UART1_TX interrupt.
-		nul_terminated = true;
+		tx_nul_terminated = true;
 		serial_tx_end = serial_tx + SERIAL_TX_LEN + 1;
 	} else {
-		nul_terminated = false;
+		tx_nul_terminated = false;
 		serial_tx_end = serial_tx + len;
 	}
 
@@ -136,7 +136,7 @@ void serial_int_uart_tx(void) __interrupt(UART1_TX)
 
 		// Check if we want to transmit more
 		bool const buf_end = serial_tx_p == serial_tx_end;
-		bool const line_end = nul_terminated && (buf_end || out == '\0');
+		bool const line_end = tx_nul_terminated && (buf_end || out == '\0');
 		if (buf_end || line_end) {
 			// This is the last byte. Disable this event
 			// and enable rx ready event
