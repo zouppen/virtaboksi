@@ -10,6 +10,7 @@
 #define STARTUP_DEBOUNCE_MS 500
 #define MINIMUM_WAKEUP_MS 100
 #define SERIAL_KEEPALIVE_MS 1000
+#define HALT_ENABLED
 
 // On bootup, have a small pause after bootup before switching loads,
 // to avoid oscillation in case of a boot loop.
@@ -251,11 +252,15 @@ int main(void)
 	while (true) {
 		loop();
 
+#ifdef HALT_ENABLED
 		if (!timers_running && !serial_is_transmitting()) {
 			controlled_halt();
 		} else {
 			wfi();
 		}
+#else
+		wfi();
+#endif
 	}
 }
 
