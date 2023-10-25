@@ -8,6 +8,7 @@
 
 #define DEBOUNCE_MS 200
 #define STARTUP_DEBOUNCE_MS 500
+#define PANIC_OFF_MS 1000
 #define MINIMUM_WAKEUP_MS 100
 #define SERIAL_KEEPALIVE_MS 1000
 #define HALT_ENABLED
@@ -15,6 +16,10 @@
 // On bootup, have a small pause after bootup before switching loads,
 // to avoid oscillation in case of a boot loop.
 static volatile uint16_t ctrl_debounce = STARTUP_DEBOUNCE_MS;
+
+// In case excessive flipflopping, turn all outputs off since it might
+// be an indicator of a hardware error.
+static volatile uint16_t ctrl_panic = PANIC_OFF_MS;
 
 // Used to postpone sleeping for any reason, including waiting for
 // serial traffic.
@@ -31,7 +36,7 @@ static uint8_t serial_rx[SERIAL_RX_LEN];
 static uint8_t *serial_rx_p = serial_rx;
 
 static void controlled_halt(void);
-static void update_outputs(void);
+static void update_outputs(bool const panic);
 static void debounce_arm(void);
 static void loop(void);
 
@@ -75,14 +80,14 @@ static void controlled_halt(void)
 	}
 }
 
-static void update_outputs(void)
+static void update_outputs(bool const panic)
 {
 	bool const sw_away = !READ(PIN_IN1);
 	bool const sw_home = !READ(PIN_IN2);
 	bool const bat_good = READ(PIN_IN3);
 	bool const sw_main = sw_home || sw_away;
 
-	if (!bat_good || !sw_main) {
+	if (panic || !bat_good || !sw_main) {
 		// BAT bad or OFF state: all outputs off
 		LOW(PIN_GROUP1);
 		LOW(PIN_GROUP2);
@@ -178,8 +183,17 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ)
 	if (ctrl_debounce) {
 		if (--ctrl_debounce) {
 			running = true;
+
+			// Panic condition countdown
+			if (ctrl_panic) {
+				if (!--ctrl_panic) {
+					update_outputs(true);
+				}
+			}
 		} else {
-			update_outputs();
+			// Input is settled
+			ctrl_panic = PANIC_OFF_MS;
+			update_outputs(false);
 		}
 	}
 
