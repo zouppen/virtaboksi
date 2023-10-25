@@ -202,8 +202,8 @@ int main(void)
 	// LED is push-pull output (CR1 already set)
 	OUTPUT(PIN_LED_PCB);
 
-	// Inputs have already pull-up resistors, so we turn pull-up
-	// off (CR1) and enable interrupts (CR2).
+	// Inputs have already discrete pull-up resistors, so we turn
+	// their pull-up off (CR1) and enable interrupts (CR2).
 	REG_LOW(CR1, PIN_IN1);
 	REG_LOW(CR1, PIN_IN2);
 	REG_LOW(CR1, PIN_IN3);
@@ -213,8 +213,8 @@ int main(void)
 	REG_HIGH(CR2, PIN_IN3);
 	REG_HIGH(CR2, PIN_IN4);
 
-	// Serial port has an external pull-up, no need to put CR1 on.
-	REG_LOW(CR1, PIN_RX); // We have external pull-up
+	// Serial port has an external pull-up, too, disabling pull-up
+	REG_LOW(CR1, PIN_RX);
 
 	// MOSFET controls and LEDs are push-pull outputs
 	// (CR1 already set)
