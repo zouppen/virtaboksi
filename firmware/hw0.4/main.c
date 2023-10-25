@@ -1,5 +1,6 @@
 /* Firmware for Virtaboksi v0.4 and above */
 #include <stm8.h>
+#include <string.h>
 #include "board.h"
 #include "iref.h"
 #include "util.h"
@@ -21,13 +22,12 @@ static volatile uint16_t snooze_suppressor = 0;
 // A global flag for carrying state from ISR to main loop
 static volatile bool timers_running = true;
 
+static volatile bool end_of_line = false;
+
 // These are handled inside ISRs only so no need to make them
 // volatile.
-#define SERIAL_BUF_SIZE 80
-static uint8_t serial_buf[SERIAL_BUF_SIZE];
-static uint8_t *serial_rx_p = serial_buf;
-static const uint8_t *serial_tx_p = serial_buf;
-static void *serial_tx_end; // Indicator when to stop sending
+static uint8_t serial_rx[SERIAL_RX_LEN];
+static uint8_t *serial_rx_p = serial_rx;
 
 static void controlled_halt(void);
 static void update_outputs(void);
@@ -117,57 +117,19 @@ void uart_rx(void) __interrupt(UART1_RX)
 		// Keep CPU running until we've received a whole message
 		snooze_suppressor = SERIAL_KEEPALIVE_MS;
 
-		// Funny little test
-		if (chr == '\r') {
-			// Terminate string
-			*serial_rx_p++ = '\r';
-			*serial_rx_p++ = '\n';
+		serial_rx_activity();
 
-			// Reset buffers
-			serial_tx_end = serial_rx_p;
-			serial_tx_p = serial_buf;
-			serial_rx_p = serial_buf;
-
-			// Enable RS-485
-			HIGH(PIN_TX_EN);
-
-			// Enable interrupt to suck the data from tx buffer
-			UART1_CR2 |= UART_CR2_TIEN;
-		} else if (serial_rx_p == serial_buf + SERIAL_BUF_SIZE - 2) {
-			// Buffer overflow. Ignore byte.
+		if (end_of_line) {
+			// End of line already reached
+		} else if (serial_rx_p == serial_rx + SERIAL_RX_LEN) {
+			// Buffer overflow imminent!
 		} else {
-			// Have some fun by running rot13 on input
-			*serial_rx_p++ = util_rot13(chr);
+			// Okay, getting byte then
+			*serial_rx_p++ = chr;
 		}
-	}
-}
 
-void uart_tx(void) __interrupt(UART1_TX)
-{
-	// Since we share the same interrupt, we have to have a state
-	// for the send and finish conditions.
-	if (serial_tx_p < serial_tx_end) {
-		// Can we yet send?
-		if (UART1_SR & UART_SR_TXE) {
-			// Check if want to transmit more
-			uint8_t const out = *serial_tx_p++;
-			if (serial_tx_p == serial_tx_end) {
-				// Do not come here again and wait enable the
-				// TX ready interrupt.
-				UART1_CR2 ^= UART_CR2_TIEN | UART_CR2_TCIEN;
-			}
-
-			// Send byte
-			UART1_DR = out;
-		}
-	} else {
-		// Is the last byte already finished
-		if (UART1_SR & UART_SR_TC) {
-			// Transmit finished. Disable TCIEN
-			UART1_CR2 &= ~UART_CR2_TCIEN;
-
-			// Turn off RS-485 transmitter
-			LOW(PIN_TX_EN);
+		if (chr == '\n') {
+			end_of_line = true;
 		}
 	}
 }
@@ -210,6 +172,8 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ)
 			running = true;
 		}
 	}
+
+	serial_tick();
 
 	// Update the global flag to indicate readiness for a sleep.
 	timers_running = running;
@@ -294,4 +258,23 @@ int main(void)
 // perform longer duration tasks. Interrupts are enabled.
 static void loop(void)
 {
+	if (end_of_line) {
+		// We've got a line, let's convert it. This is a
+		// little bit unsafe, but is a placeholder for the
+		// real logic only.
+		strcpy(serial_tx, "Saatiin: ");
+		buflen_t const head = 9;
+		for (buflen_t i=0; i<SERIAL_TX_LEN-head; i++) {
+			char const c = serial_rx[i];
+			if (c == '\n') {
+				serial_tx[head+i] = '\0';
+				break;
+			} else {
+				serial_tx[head+i] = util_rot13(c);
+			}
+		}
+		serial_rx_p = serial_rx;
+		end_of_line = false;
+		serial_tx_line();
+	}
 }

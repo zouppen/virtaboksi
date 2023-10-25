@@ -7,6 +7,16 @@
 
 typedef uint8_t buflen_t;
 
+// FIXME Move these to CMake config!
+
+#define BAUD 9600
+
+// MODBUS_SILENCE is the 14 bit long duration on the serial line,
+// measured in TIMER2 ticks. We consider a frame to be ready after 14
+// bits and after another 14 bits we can start transmitting.
+// https://en.wikipedia.org/wiki/Modbus#Modbus_RTU_frame_format_(primarily_used_on_asynchronous_serial_data_lines_like_RS-485/EIA-485)
+#define MODBUS_SILENCE 3
+
 // Serial buffer lengths. If you want to go beyond 255, remember to
 // change buflen_t from uint8_t to uint16_t.
 #define SERIAL_RX_LEN 80
@@ -32,6 +42,12 @@ void serial_init(void);
 // Is serial transmitter on?
 bool serial_is_transmitting(void);
 
+// Called from timer interrupt regularily
+void serial_tick(void);
+
+// Temporarily here until RX is moved to serial.c // FIXME //
+void serial_rx_activity(void);
+
 // Gets a message from serial receive buffer, if any. The returned
 // buffer is immutable. Buffer must be released after processing with
 // serial_free_message(). In case buffer overflow, returns ~0.
@@ -51,3 +67,6 @@ void serial_tx_bin(buflen_t const len);
 
 // Get serial counters and zero them
 serial_counter_t pull_serial_counters(void);
+
+// UART RX interrupt
+void serial_int_uart_tx(void) __interrupt(UART1_TX);
