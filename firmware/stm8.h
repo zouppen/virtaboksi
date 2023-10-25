@@ -77,6 +77,18 @@ bool stm8_uart1_baudrate(uint16_t rate);
 #define PD_CR1 *(volatile unsigned char *)0x5012
 #define PD_CR2 *(volatile unsigned char *)0x5013
 
+#define PE_ODR *(volatile unsigned char *)0x5014
+#define PE_IDR *(volatile unsigned char *)0x5015
+#define PE_DDR *(volatile unsigned char *)0x5016
+#define PE_CR1 *(volatile unsigned char *)0x5017
+#define PE_CR2 *(volatile unsigned char *)0x5018
+
+#define PF_ODR *(volatile unsigned char *)0x5019
+#define PF_IDR *(volatile unsigned char *)0x501A
+#define PF_DDR *(volatile unsigned char *)0x501B
+#define PF_CR1 *(volatile unsigned char *)0x501C
+#define PF_CR2 *(volatile unsigned char *)0x501D
+
 /* UART */
 #define UART1_SR *(volatile unsigned char *)0x5230
 #define UART1_DR *(volatile unsigned char *)0x5231

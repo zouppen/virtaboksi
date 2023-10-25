@@ -196,6 +196,8 @@ int main(void)
 	PB_CR1 = 0xFF;
 	PC_CR1 = 0xFF;
 	PD_CR1 = 0xFF;
+	PE_CR1 = 0xFF;
+	PF_CR1 = 0xFF;
 
 	// LED is push-pull output (CR1 already set)
 	OUTPUT(PIN_LED_PCB);
