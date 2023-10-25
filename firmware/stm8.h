@@ -344,8 +344,11 @@ bool stm8_uart1_baudrate(uint16_t rate);
 #define TIM3_OVR_UIF_IRQ 15
 #define ADC1_EOC_IRQ 22
 #define TIM4_OVR_UIF_IRQ 23
+#define EXTI0_IRQ 3
+#define EXTI1_IRQ 4
 #define EXTI2_IRQ 5
 #define EXTI3_IRQ 6
+#define EXTI4_IRQ 7
 #define UART1_TX 17
 #define UART1_RX 18
 
