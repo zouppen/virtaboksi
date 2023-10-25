@@ -109,10 +109,15 @@ static void update_outputs(void)
 
 void uart_rx(void) __interrupt(UART1_RX)
 {
-	// Incoming data
-	if (UART1_SR & UART_SR_RXNE) {
-		// Reading the byte also clears the RXNE flag
-		uint8_t const chr = UART1_DR;
+	// Cache values to avoid the register getting cleared. This
+	// sequence also clears register values.
+	uint8_t const sr = UART1_SR;
+	uint8_t const chr = UART1_DR;
+
+	if (sr & UART_SR_FE) {
+		// Break character or garbage. Ignore.
+	} else if (sr & UART_SR_RXNE) {
+		// Incoming proper data
 
 		// Keep CPU running until we've received a whole message
 		snooze_suppressor = SERIAL_KEEPALIVE_MS;
