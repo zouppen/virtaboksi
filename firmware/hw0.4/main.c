@@ -32,6 +32,7 @@ static uint8_t *serial_rx_p = serial_rx;
 
 static void controlled_halt(void);
 static void update_outputs(void);
+static void debounce_arm(void);
 static void loop(void);
 
 // Halts CPU. This must be called outside of interrupt handlers.
@@ -108,6 +109,11 @@ static void update_outputs(void)
 	}
 }
 
+static void debounce_arm(void)
+{
+	ctrl_debounce = DEBOUNCE_MS;
+}
+
 void uart_rx(void) __interrupt(UART1_RX)
 {
 	// Cache values to avoid the register getting cleared. This
@@ -140,9 +146,14 @@ void uart_rx(void) __interrupt(UART1_RX)
 	}
 }
 
+void int_on_portb(void) __interrupt(EXTI1_IRQ)
+{
+	debounce_arm();
+}
+
 void int_on_portc(void) __interrupt(EXTI2_IRQ)
 {
-	ctrl_debounce = DEBOUNCE_MS;
+	debounce_arm();
 }
 
 void int_on_portd(void) __interrupt(EXTI3_IRQ)
