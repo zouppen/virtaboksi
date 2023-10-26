@@ -45,9 +45,6 @@ bool serial_is_transmitting(void);
 // Called from timer interrupt regularily
 void serial_tick(void);
 
-// Temporarily here until RX is moved to serial.c // FIXME //
-void serial_rx_activity(void);
-
 // Gets a message from serial receive buffer, if any. The returned
 // buffer is immutable. Buffer must be released after processing with
 // serial_free_message(). In case buffer overflow, returns ~0.
@@ -65,8 +62,9 @@ void serial_tx_line(void);
 // Start half-duplex transmission (disables rx). Binary safe.
 void serial_tx_bin(buflen_t const len);
 
-// Get serial counters and zero them
-serial_counter_t pull_serial_counters(void);
+// Get serial counters and zero them. (enables interrupts)
+void pull_serial_counters(serial_counter_t *copy);
 
-// UART RX interrupt
+// UART interrupts
+void serial_int_uart_rx(void) __interrupt(UART1_RX);
 void serial_int_uart_tx(void) __interrupt(UART1_TX);

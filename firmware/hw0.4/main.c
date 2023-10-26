@@ -20,13 +20,6 @@ static volatile uint16_t ctrl_panic = PANIC_OFF_MS;
 // A global flag for carrying state from ISR to main loop
 static volatile bool timers_running = true;
 
-static volatile bool end_of_line = false;
-
-// These are handled inside ISRs only so no need to make them
-// volatile.
-static uint8_t serial_rx[SERIAL_RX_LEN];
-static uint8_t *serial_rx_p = serial_rx;
-
 static void controlled_halt(void);
 static void update_outputs(bool const panic);
 static void debounce_arm(void);
@@ -128,38 +121,6 @@ static bool debounce_tick(void)
 		update_outputs(false);
 	}
 	return false;
-}
-
-void uart_rx(void) __interrupt(UART1_RX)
-{
-	// Cache values to avoid the register getting cleared. This
-	// sequence also clears register values.
-	uint8_t const sr = UART1_SR;
-	uint8_t const chr = UART1_DR;
-
-	if (sr & UART_SR_FE) {
-		// Break character or garbage. Ignore.
-	} else if (sr & UART_SR_RXNE) {
-		// Incoming proper data
-
-		// Keep CPU running until we've received a whole message
-		timers_stay_awake(SERIAL_KEEPALIVE_MS);
-
-		serial_rx_activity();
-
-		if (end_of_line) {
-			// End of line already reached
-		} else if (serial_rx_p == serial_rx + SERIAL_RX_LEN) {
-			// Buffer overflow imminent!
-		} else {
-			// Okay, getting byte then
-			*serial_rx_p++ = chr;
-		}
-
-		if (chr == '\n') {
-			end_of_line = true;
-		}
-	}
 }
 
 void int_on_portb(void) __interrupt(EXTI1_IRQ)
@@ -280,23 +241,29 @@ int main(void)
 // perform longer duration tasks. Interrupts are enabled.
 static void loop(void)
 {
-	if (end_of_line) {
-		// We've got a line, let's convert it. This is a
-		// little bit unsafe, but is a placeholder for the
-		// real logic only.
-		strcpy(serial_tx, "Saatiin: ");
-		buflen_t const head = 9;
-		for (buflen_t i=0; i<SERIAL_TX_LEN-head; i++) {
-			char const c = serial_rx[i];
-			if (c == '\n') {
-				serial_tx[head+i] = '\0';
-				break;
-			} else {
-				serial_tx[head+i] = util_rot13(c);
+	char const *serial_rx;
+	buflen_t len = serial_get_message(&serial_rx);
+
+	if (serial_rx != NULL) {
+		if (!strcmp(serial_rx, "PAUSES")) {
+			strcpy(serial_tx, "taukoja ei ole");
+		} else {
+			// We've got a line, let's convert it. This is a
+			// little bit unsafe, but is a placeholder for the
+			// real logic only.
+			strcpy(serial_tx, "Saatiin: ");
+			buflen_t const head = 9;
+			for (buflen_t i=0; i<SERIAL_TX_LEN-head; i++) {
+				char const c = serial_rx[i];
+				if (c == '\n') {
+					serial_tx[head+i] = '\0';
+					break;
+				} else {
+					serial_tx[head+i] = util_rot13(c);
+				}
 			}
 		}
-		serial_rx_p = serial_rx;
-		end_of_line = false;
+		serial_free_message();
 		serial_tx_line();
 	}
 }
