@@ -201,8 +201,11 @@ void serial_int_uart_rx(void) __interrupt(UART1_RX)
 	if (sr & UART_SR_FE) {
 		// BREAK signal or garbage.
 		serial_rx_p = serial_rx_back;
+
+		HIGH(PIN_OUT3);
 	} else if (sr & UART_SR_RXNE) {
 		// Incoming proper data
+		LOW(PIN_OUT3);
 
 		// Keep CPU running until we've received a whole message
 		timers_stay_awake(SERIAL_KEEPALIVE_MS);
