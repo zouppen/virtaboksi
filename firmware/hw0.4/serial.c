@@ -200,7 +200,7 @@ void serial_int_uart_rx(void) __interrupt(UART1_RX)
 
 	if (sr & UART_SR_FE) {
 		// BREAK signal or garbage.
-		end_of_frame(false);
+		serial_rx_p = serial_rx_back;
 	} else if (sr & UART_SR_RXNE) {
 		// Incoming proper data
 

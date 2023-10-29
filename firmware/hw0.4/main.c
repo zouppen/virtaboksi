@@ -255,7 +255,7 @@ static void loop(void)
 			buflen_t const head = 9;
 			for (buflen_t i=0; i<SERIAL_TX_LEN-head; i++) {
 				char const c = serial_rx[i];
-				if (c == '\n') {
+				if (c == '\0') {
 					serial_tx[head+i] = '\0';
 					break;
 				} else {
