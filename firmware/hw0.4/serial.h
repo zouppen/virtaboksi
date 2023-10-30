@@ -26,10 +26,22 @@ typedef uint8_t buflen_t;
 // this because this indicates the maximum value.
 #define BUFLEN_MAX ({ buflen_t _a = ~0; _a; })
 
+typedef enum {
+	EMPTY,    // No message, p is undefined
+	BINARY,   // Message contains binary payload
+	TEXT,     // Message is NUL-terminated ASCII
+	BREAK,    // Message is interrupted by a BREAK
+	OVERFLOW  // Message has overflown
+} serial_state_t;
+
 typedef struct {
-	int good;         // Number of good frames
+	int len;                      // Buffer length
+	serial_state_t state;         // Buffer state
+	uint8_t data[SERIAL_RX_LEN];  // Pointer to buffer
+} serial_buffer_t;
+
+typedef struct {
 	int flip_timeout; // Number of missed flips
-	int too_long_rx;  // Number of too long frames in receive
 	int too_long_tx;  // Number of too long frames in transmit
 } serial_counter_t;
 
@@ -45,10 +57,10 @@ bool serial_is_transmitting(void);
 // Called from timer interrupt regularily
 void serial_tick(void);
 
-// Gets a message from serial receive buffer, if any. The returned
-// buffer is immutable. Buffer must be released after processing with
-// serial_free_message(). In case buffer overflow, returns ~0.
-buflen_t serial_get_message(char **const buf);
+// Gets a message from serial receive buffer. Buffer must be released
+// after processing with serial_free_message(). In case no message is
+// received, NULL is returned
+serial_buffer_t *serial_get_message(void);
 
 // Release receive buffer. This is important to do as soon as
 // possible. If frame is not freed before back buffer is filled,

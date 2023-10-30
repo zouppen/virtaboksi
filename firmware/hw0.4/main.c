@@ -24,7 +24,7 @@ static void controlled_halt(void);
 static void update_outputs(bool const panic);
 static void debounce_arm(void);
 static bool debounce_tick(void);
-static void loop(void);
+static bool loop(void);
 
 // Halts CPU. This must be called outside of interrupt handlers.
 static void controlled_halt(void)
@@ -223,7 +223,7 @@ int main(void)
 	// Stay in light sleep to keep timers going. If nothing to
 	// run, go to halt mode.
 	while (true) {
-		loop();
+		while (loop());
 
 #ifdef HALT_ENABLED
 		if (!timers_running && !serial_is_transmitting()) {
@@ -239,13 +239,13 @@ int main(void)
 
 // Run after waking up from the interrupts. Can be used to
 // perform longer duration tasks. Interrupts are enabled.
-static void loop(void)
+static bool loop(void)
 {
-	char const *serial_rx;
-	buflen_t len = serial_get_message(&serial_rx);
+	serial_buffer_t *const rx = serial_get_message();
+	if (rx == NULL) return false;
 
-	if (serial_rx != NULL) {
-		if (!strcmp(serial_rx, "PAUSES")) {
+	if (rx->state == TEXT) {
+		if (!strcmp(rx->data, "PAUSES")) {
 			strcpy(serial_tx, "taukoja ei ole");
 		} else {
 			// We've got a line, let's convert it. This is a
@@ -254,7 +254,7 @@ static void loop(void)
 			strcpy(serial_tx, "Saatiin: ");
 			buflen_t const head = 9;
 			for (buflen_t i=0; i<SERIAL_TX_LEN-head; i++) {
-				char const c = serial_rx[i];
+				char const c = rx->data[i];
 				if (c == '\0') {
 					serial_tx[head+i] = '\0';
 					break;
@@ -263,7 +263,12 @@ static void loop(void)
 				}
 			}
 		}
-		serial_free_message();
 		serial_tx_line();
+	} else {
+		// We don't understand this message type (yet)
 	}
+
+	// Come again for more messages!
+	serial_free_message();
+	return true;
 }

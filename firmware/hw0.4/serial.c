@@ -16,26 +16,25 @@ static volatile bool tx_state = false; // Is tx start requested
 static volatile bool tx_nul_terminated; // Flag for \0 terminated buffer
 
 // Serial receive vars. Using double buffering for rx
-static char serial_rx_a[SERIAL_RX_LEN]; // Receive buffer a
-static char serial_rx_b[SERIAL_RX_LEN]; // Receive buffer b
-static char *serial_rx_back = serial_rx_a; // Back buffer (for populating data)
-static char *serial_rx_p = serial_rx_a; // Back buffer write pointer
-static char *serial_rx_front = NULL; // Contains front buffer if it's not yet freed
-static buflen_t serial_rx_front_len; // Contains front buffer data length
+static serial_buffer_t rx_buf_a = {0, EMPTY};
+static serial_buffer_t rx_buf_b = {0, EMPTY};
+static serial_buffer_t *rx_front = NULL; // Current front buffer (NULL if not locked)
+static serial_buffer_t *rx_back = &rx_buf_a; // Current back buffer (for populating data)
+static char *rx_p = rx_buf_a.data; // Back buffer write pointer
 static volatile uint16_t rx_cooldown_left = 0; // To avoid half-duplex clash
 
 // (Error) counters
-static volatile serial_counter_t counts = {0, 0, 0};
+static volatile serial_counter_t counts = {0, 0};
 
 // Prototypes
-static void end_of_frame(bool const good);
+static void end_of_frame(void);
 static void may_send(buflen_t len);
 static void transmit_now(void);
 
 // Called from timer interrupt handler when we're between frames.
-static void end_of_frame(bool const good)
+static void end_of_frame(void)
 {
-	bool locked = serial_rx_front != NULL;
+	bool const locked = rx_front != NULL;
 	if (locked) {
 		// We need to throw a frame overboard
 		// because main loop didn't process
@@ -43,46 +42,28 @@ static void end_of_frame(bool const good)
 		counts.flip_timeout++;
 		goto rewind;
 	}
-	if (good) {
-		// Looks good, at least before CRC checks and so.
-		counts.good++;
-	} else {
-		// Too long frame increments error counter. We still want to sometimes process the start of it
-		counts.too_long_rx++;
-	}
 
-	// Collect length for later use.
-	serial_rx_front_len = serial_rx_p == NULL
-		? SERIAL_RX_LEN
-		: serial_rx_p - serial_rx_back;
+	// Populate length
+	rx_back->len = rx_p - rx_back->data;
 
 	// Flip buffers!
-	serial_rx_front = serial_rx_back;
-	serial_rx_back = (serial_rx_a == serial_rx_back)
-		? serial_rx_b
-		: serial_rx_a;
+	rx_front = rx_back;
+	rx_back = (&rx_buf_a == rx_back) ? &rx_buf_b : &rx_buf_a;
 
 rewind:
 	// Latest but not least: Rewind receive buffer
-	serial_rx_p = serial_rx_back;
+	rx_back->state = EMPTY;
+	rx_p = rx_back->data;
 }
 
-buflen_t serial_get_message(char **const buf) __critical
+serial_buffer_t *serial_get_message(void) __critical
 {
-	int len;
-	if (serial_rx_front == NULL) {
-		*buf = NULL;
-		return 0;
-	}
-
-	*buf = serial_rx_front;
-	len = serial_rx_front_len;
-	return len;
+	return rx_front;
 }
 
 void serial_free_message(void) __critical
 {
-	serial_rx_front = NULL;
+	rx_front = NULL;
 }
 
 void pull_serial_counters(serial_counter_t *const copy) __critical
@@ -200,7 +181,8 @@ void serial_int_uart_rx(void) __interrupt(UART1_RX)
 
 	if (sr & UART_SR_FE) {
 		// BREAK signal or garbage.
-		serial_rx_p = serial_rx_back;
+		rx_front->state = BREAK;
+		end_of_frame();
 
 		HIGH(PIN_OUT3);
 	} else if (sr & UART_SR_RXNE) {
@@ -213,26 +195,27 @@ void serial_int_uart_rx(void) __interrupt(UART1_RX)
 		// Resetting rx timers
 		rx_cooldown_left = MODBUS_SILENCE;
 
-		bool const full = serial_rx_p == serial_rx_back + SERIAL_RX_LEN;
+		bool const full = rx_p == rx_back->data + SERIAL_RX_LEN;
 
-		if (serial_rx_p == NULL) {
+		if (rx_back->state == OVERFLOW) {
 			// Overflow has already happened earlier.
 			if (chr == '\n') {
-				end_of_frame(false);
+				end_of_frame();
 			}
 		} else if (chr == '\n') {
 			// End of line
 			if (!full) {
 				// Terminate string
-				*serial_rx_p = '\0';
+				*rx_p = '\0';
 			}
-			end_of_frame(true);
+			rx_back->state = TEXT; // FIXME detect text properly
+			end_of_frame();
 		} else if (full) {
 			// Overflow happens now but is not line terminator
-			serial_rx_p = NULL;
+			rx_back->state = OVERFLOW;
 		} else {
 			// We have space for a new char
-			*serial_rx_p++ = chr;
+			*rx_p++ = chr;
 		}
 	}
 }
