@@ -14,6 +14,12 @@ void stm8_configure_clock(void);
 // invalid value.
 bool stm8_uart1_baudrate(uint16_t rate);
 
+// Make EEPROM read-write
+void stm8_eeprom_unlock(void);
+
+// Make EEPROM read-only
+void stm8_eeprom_lock(void);
+
 // MACROS FOR EASY PIN HANDLING FOR ATMEL GCC-AVR, adapted to STM8
 // From https://stackoverflow.com/a/25986570/514723
 
@@ -46,6 +52,10 @@ bool stm8_uart1_baudrate(uint16_t rate);
 
 // Shorthand for 8-bit registers
 #define _SFR_(mem_addr)      (*(volatile uint8_t *)((mem_addr)))
+
+// EEPROM address range
+#define EEPROM_START_ADDR      0x4000
+#define EEPROM_END_ADDR        0x407F
 
 /* Register addresses */
 
@@ -91,6 +101,38 @@ bool stm8_uart1_baudrate(uint16_t rate);
 #define PF_DDR _SFR_(0x501B)
 #define PF_CR1 _SFR_(0x501C)
 #define PF_CR2 _SFR_(0x501D)
+
+/* Flash */
+#define FLASH_BASE_ADDRESS      0x505A
+#define FLASH_CR1               _SFR_(FLASH_BASE_ADDRESS + 0x00)
+#define FLASH_CR1_HALT          _BV(3)
+#define FLASH_CR1_AHALT         _BV(2)
+#define FLASH_CR1_IE            _BV(1)
+#define FLASH_CR1_FIX           _BV(0)
+#define FLASH_CR2               _SFR_(FLASH_BASE_ADDRESS + 0x01)
+#define FLASH_CR2_OPT           _BV(7)
+#define FLASH_CR2_WPRG          _BV(6)
+#define FLASH_CR2_ERASE         _BV(5)
+#define FLASH_CR2_FPRG          _BV(4)
+#define FLASH_CR2_PRG           _BV(0)
+#define FLASH_NCR2              _SFR_(FLASH_BASE_ADDRESS + 0x02)
+#define FLASH_NCR2_NOPT         _BV(7)
+#define FLASH_NCR2_NWPRG        _BV(6)
+#define FLASH_NCR2_NERASE       _BV(5)
+#define FLASH_NCR2_NFPRG        _BV(4)
+#define FLASH_NCR2_NPRG         _BV(0)
+#define FLASH_FPR               _SFR_(FLASH_BASE_ADDRESS + 0x03)
+#define FLASH_NFPR              _SFR_(FLASH_BASE_ADDRESS + 0x04)
+#define FLASH_IAPSR             _SFR_(FLASH_BASE_ADDRESS + 0x05)
+#define FLASH_IAPSR_DUL         _BV(3)
+#define FLASH_IAPSR_EOP         _BV(2)
+#define FLASH_IAPSR_PUL         _BV(1)
+#define FLASH_PUKR              _SFR_(FLASH_BASE_ADDRESS + 0x08)
+#define FLASH_PUKR_KEY1         0x56
+#define FLASH_PUKR_KEY2         0xAE
+#define FLASH_DUKR              _SFR_(FLASH_BASE_ADDRESS + 0x0A)
+#define FLASH_DUKR_KEY1         FLASH_PUKR_KEY2
+#define FLASH_DUKR_KEY2         FLASH_PUKR_KEY1
 
 /* UART */
 #define UART1_SR _SFR_(0x5230)

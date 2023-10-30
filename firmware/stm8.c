@@ -25,3 +25,15 @@ void stm8_configure_clock(void)
 #error No support for this CPU frequency. FIXME by editing stm8.c
 #endif
 }
+
+void stm8_eeprom_unlock(void)
+{
+    FLASH_DUKR = FLASH_DUKR_KEY1;
+    FLASH_DUKR = FLASH_DUKR_KEY2;
+    while (!(FLASH_IAPSR & FLASH_IAPSR_DUL));
+}
+
+void stm8_eeprom_lock(void)
+{
+    FLASH_IAPSR &= ~FLASH_IAPSR_DUL;
+}
