@@ -177,7 +177,7 @@ static void transmit_now_IM(void)
 	UART1_CR2 |= UART_CR2_TIEN;
 }
 
-void serial_int_uart_rx(void) __interrupt(UART1_RX)
+void serial_int_uart_rx(void) __interrupt(UART1_RXC_ISR)
 {
 	// Cache values to avoid the register getting cleared. This
 	// sequence also clears register values.
@@ -225,7 +225,7 @@ void serial_int_uart_rx(void) __interrupt(UART1_RX)
 	}
 }
 
-void serial_int_uart_tx(void) __interrupt(UART1_TX)
+void serial_int_uart_tx(void) __interrupt(UART1_TXC_ISR)
 {
 	// Since we share the same interrupt, we have to have check if
 	// we have enabled such event before going to check the flags.

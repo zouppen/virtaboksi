@@ -82,5 +82,5 @@ void serial_tx_bin(buflen_t const len);
 void pull_serial_counters(serial_counter_t *copy);
 
 // UART interrupts
-void serial_int_uart_rx(void) __interrupt(UART1_RX);
-void serial_int_uart_tx(void) __interrupt(UART1_TX);
+void serial_int_uart_rx(void) __interrupt(UART1_RXC_ISR);
+void serial_int_uart_tx(void) __interrupt(UART1_TXC_ISR);

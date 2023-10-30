@@ -122,23 +122,23 @@ static bool debounce_tick_IM(void)
 	return false;
 }
 
-void int_on_portb(void) __interrupt(EXTI1_IRQ)
+void int_on_portb(void) __interrupt(EXTI1_ISR)
 {
 	debounce_arm_IM();
 }
 
-void int_on_portc(void) __interrupt(EXTI2_IRQ)
+void int_on_portc(void) __interrupt(EXTI2_ISR)
 {
 	debounce_arm_IM();
 }
 
-void int_on_portd(void) __interrupt(EXTI3_IRQ)
+void int_on_portd(void) __interrupt(EXTI3_ISR)
 {
 	// OBS! When we wake up from serial activity, we get here once
 	// and it's inevitable.
 }
 
-void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ)
+void run_every_1ms(void) __interrupt(TIM2_OVF_ISR)
 {
 	// Clear Timer 2 Status Register 1 Update Interrupt Flag (UIF)
 	TIM2_SR1 &= ~TIM_SR1_UIF;

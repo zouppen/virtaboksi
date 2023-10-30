@@ -338,70 +338,34 @@ bool stm8_uart1_baudrate(uint16_t rate);
 #define wfi()                 {__asm__("wfi\n");}  /* Wait For Interrupt */
 #define halt()                {__asm__("halt\n");} /* Halt */
 
-/* Interrupt numbers */
-#define TIM1_OVR_UIF_IRQ 11
-#define TIM2_OVR_UIF_IRQ 13
-#define TIM3_OVR_UIF_IRQ 15
-#define ADC1_EOC_IRQ 22
-#define TIM4_OVR_UIF_IRQ 23
-#define EXTI0_IRQ 3
-#define EXTI1_IRQ 4
-#define EXTI2_IRQ 5
-#define EXTI3_IRQ 6
-#define EXTI4_IRQ 7
-#define UART1_TX 17
-#define UART1_RX 18
-
-/*
-Interrupts:
-
-0 TLI
-1 AWU Auto Wake up from Halt
-2 CLK Clock controller
-3 EXTI0 Port A external interrupts
-4 EXTI1 Port B external interrupts
-5 EXTI2 Port C external interrupts
-6 EXTI3 Port D external interrupts
-7 EXTI4 Port E external interrupts
-8 CAN CAN RX interrupt
-9 CAN CAN TX/ER/SC interrupt
-10 SPI End of Transfer
-11 TIM1 Update /Overflow/Underflow/Trigger/Break
-12 TIM1 Capture/Compare
-13 TIM2 Update /Overflow
-14 TIM2 Capture/Compare
-15 TIM3 Update /Overflow
-16 TIM3 Capture/Compare
-17 UART1 Tx complete
-18 UART1 Receive Register DATA FULL
-19 I2C I2C interrupt
-20 UART2/3 Tx complete
-21 UART2/3 Receive Register DATA FULL
-22 ADC End of Conversion
-23 TIM4 Update/Overflow
-24 FLASH EOP/WR_PG_DIS
-
-TLI 0
-AWU 1
-CLK 2
-EXTI_PORTA 3
-EXTI_PORTB 4
-EXTI_PORTC
-EXTI_PORTD
-EXTI_PORTE
-CAN_RX
-CAN_TX
-SPI
-TIM1_UPD_OVF_TRG_BRK
-TIM1_CAP_COM
-TIM2_UPD_OVF_BRK
-TIM2_CAP_COM
-TIM3_UPD_OVF_BRK
-TIM3_CAP_COM
-UART1_TX
-UART1_RX
-I2C 19
-ADC1 22
-TIM4_UPD_OVF 23
-EEPROM_EEC 24
-*/
+/* Interrupts */
+#define TLI_ISR                 0
+#define AWU_ISR                 1
+#define CLK_ISR                 2
+#define EXTI0_ISR               3
+#define EXTI1_ISR               4
+#define EXTI2_ISR               5
+#define EXTI3_ISR               6
+#define EXTI4_ISR               7
+#define CAN_RX_ISR              8   /* dual use, device dependent */
+#define EXTI5_ISR               8   /* dual use, device dependent */
+#define CAN_TX_ISR              9
+#define SPI_ISR                 10
+#define TIM1_OVF_ISR            11
+#define TIM1_CC_ISR             12
+#define TIM2_OVF_ISR            13   /* dual use, device dependent */
+#define TIM5_OVF_ISR            13   /* dual use, device dependent */
+#define TIM2_CC_ISR             14   /* dual use, device dependent */
+#define TIM5_CC_ISR             14   /* dual use, device dependent */
+#define TIM3_OVF_ISR            15
+#define TIM3_CC_ISR             16
+#define UART1_TXC_ISR           17
+#define UART1_RXC_ISR           18
+#define I2C_ISR                 19
+#define UART2_3_4_TXC_ISR       20
+#define UART2_3_4_RXC_ISR       21
+#define ADC1_ISR                22   /* dual use, device dependent */
+#define ADC2_ISR                22   /* dual use, device dependent */
+#define TIM4_ISR                23   /* dual use, device dependent */
+#define TIM6_ISR                23   /* dual use, device dependent */
+#define FLASH_ISR               24
