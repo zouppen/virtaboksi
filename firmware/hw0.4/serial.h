@@ -54,6 +54,10 @@ void serial_init_IM(void);
 // Is serial transmitter on?
 bool serial_is_transmitting(void);
 
+// Does serial have message waiting? Must be called with interrupts
+// disabled!
+bool serial_has_message_IM(void);
+
 // Called from timer interrupt regularily
 void serial_tick_IM(void);
 

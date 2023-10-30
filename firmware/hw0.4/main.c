@@ -24,7 +24,7 @@ static void controlled_halt(void);
 static void update_outputs_IM(bool const panic);
 static void debounce_arm_IM(void);
 static bool debounce_tick_IM(void);
-static bool loop(void);
+static void loop(void);
 
 // Halts CPU. This must be called outside of interrupt handlers but
 // interrupts disabled. Like wfi(), enables interrupts on return.
@@ -221,11 +221,16 @@ int main(void)
 	// Stay in light sleep to keep timers going. If nothing to
 	// run, go to halt mode.
 	while (true) {
-		while (loop());
+		loop();
 
 		// Block interrupts while whe figure out sleep method.
 		sim();
 
+		// If there are still messages to process, go to loop.
+		if (serial_has_message_IM()) {
+			rim();
+			continue;
+		}
 #ifdef HALT_ENABLED
 		if (!timers_running && !serial_is_transmitting()) {
 			controlled_halt();
@@ -242,10 +247,10 @@ int main(void)
 
 // Run after waking up from the interrupts. Can be used to
 // perform longer duration tasks. Interrupts are enabled.
-static bool loop(void)
+static void loop(void)
 {
 	serial_buffer_t *const rx = serial_get_message();
-	if (rx == NULL) return false;
+	if (rx == NULL) return;
 
 	if (rx->state == TEXT) {
 		if (!strcmp(rx->data, "PAUSES")) {
@@ -271,7 +276,5 @@ static bool loop(void)
 		// We don't understand this message type (yet)
 	}
 
-	// Come again for more messages!
 	serial_free_message();
-	return true;
 }

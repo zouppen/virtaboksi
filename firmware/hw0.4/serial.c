@@ -92,6 +92,11 @@ bool serial_is_transmitting(void)
 	return tx_state;
 }
 
+bool serial_has_message_IM(void)
+{
+	return rx_front != NULL;
+}
+
 void serial_tx_line(void)
 {
 	// Putting the continuation sign to the end unless it's
