@@ -21,9 +21,9 @@ static volatile uint16_t ctrl_panic = PANIC_OFF_MS;
 static volatile bool timers_running = true;
 
 static void controlled_halt(void);
-static void update_outputs(bool const panic);
-static void debounce_arm(void);
-static bool debounce_tick(void);
+static void update_outputs_IM(bool const panic);
+static void debounce_arm_IM(void);
+static bool debounce_tick_IM(void);
 static bool loop(void);
 
 // Halts CPU. This must be called outside of interrupt handlers.
@@ -44,11 +44,11 @@ static void controlled_halt(void)
 	// We may wake up because of start bit on UART line, meaning
 	// the first byte hasn't been yet received. Ensuring that
 	// we'll stay awake until the end of first byte at minimum.
-	timers_stay_awake(MINIMUM_WAKEUP_MS);
+	timers_stay_awake_IM(MINIMUM_WAKEUP_MS);
 	timers_running = true;
 
 	// Put IREF to powersave if no LEDs are lit
-	iref_maybe_off();
+	iref_maybe_off_IM();
 
 	halt();
 
@@ -62,11 +62,11 @@ static void controlled_halt(void)
 		REG_LOW(CR2, PIN_RX);
 
 		// Put IREF on while we stay awake
-		iref_on();
+		iref_on_IM();
 	}
 }
 
-static void update_outputs(bool const panic)
+static void update_outputs_IM(bool const panic)
 {
 	bool const sw_away = !READ(PIN_IN1);
 	bool const sw_home = !READ(PIN_IN2);
@@ -100,37 +100,37 @@ static void update_outputs(bool const panic)
 	}
 }
 
-static void debounce_arm(void)
+static void debounce_arm_IM(void)
 {
 	ctrl_debounce = DEBOUNCE_MS;
 }
 
-static bool debounce_tick(void)
+static bool debounce_tick_IM(void)
 {
 	if (ctrl_debounce) {
 		if (--ctrl_debounce) {
 			// Still running
 			if (ctrl_panic && !--ctrl_panic) {
 				// Running for too long
-				update_outputs(true);
+				update_outputs_IM(true);
 			}
 			return true;
 		}
 		// Reached zero
 		ctrl_panic = PANIC_OFF_MS;
-		update_outputs(false);
+		update_outputs_IM(false);
 	}
 	return false;
 }
 
 void int_on_portb(void) __interrupt(EXTI1_IRQ)
 {
-	debounce_arm();
+	debounce_arm_IM();
 }
 
 void int_on_portc(void) __interrupt(EXTI2_IRQ)
 {
-	debounce_arm();
+	debounce_arm_IM();
 }
 
 void int_on_portd(void) __interrupt(EXTI3_IRQ)
@@ -148,9 +148,9 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ)
 	TOGGLE(PIN_LED_PCB);
 
 	// Process ticks
-	bool const debouncing = debounce_tick();
-	bool const ticking = timers_tick();
-	serial_tick();
+	bool const debouncing = debounce_tick_IM();
+	bool const ticking = timers_tick_IM();
+	serial_tick_IM();
 
 	// Update the global flag to indicate readiness for a sleep.
 	timers_running = debouncing || ticking;
@@ -198,7 +198,7 @@ int main(void)
 
 	// Must be on before LEDs are controlled
 	BOARD_IREF_CONF;
-	iref_on();
+	iref_on_IM();
 
 	// Make interrupts trigger on both edges
 	EXTI_CR1 = 0xff;
@@ -214,7 +214,7 @@ int main(void)
 	// Control Register 1, Counter ENable bit (CEN)
 	TIM2_CR1 = TIM_CR1_CEN;
 
-	serial_init();
+	serial_init_IM();
 
 	// Enabling interrupts should be the last part of
 	// initialization.

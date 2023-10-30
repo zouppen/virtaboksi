@@ -49,13 +49,13 @@ typedef struct {
 extern char serial_tx[SERIAL_TX_LEN];
 
 // Initialize serial port.
-void serial_init(void);
+void serial_init_IM(void);
 
 // Is serial transmitter on?
 bool serial_is_transmitting(void);
 
 // Called from timer interrupt regularily
-void serial_tick(void);
+void serial_tick_IM(void);
 
 // Gets a message from serial receive buffer. Buffer must be released
 // after processing with serial_free_message(). In case no message is
@@ -74,7 +74,7 @@ void serial_tx_line(void);
 // Start half-duplex transmission (disables rx). Binary safe.
 void serial_tx_bin(buflen_t const len);
 
-// Get serial counters and zero them. (enables interrupts)
+// Get serial counters and zero them.
 void pull_serial_counters(serial_counter_t *copy);
 
 // UART interrupts

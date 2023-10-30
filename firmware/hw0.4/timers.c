@@ -5,12 +5,12 @@
 // serial traffic.
 static volatile uint16_t stay_awake = 0;
 
-void timers_stay_awake(uint16_t const a)
+void timers_stay_awake_IM(uint16_t const a)
 {
 	uint16_t b = stay_awake;
 	stay_awake = a > b ? a : b;
 }
 
-bool timers_tick(void) {
+bool timers_tick_IM(void) {
 	return stay_awake && --stay_awake;
 }

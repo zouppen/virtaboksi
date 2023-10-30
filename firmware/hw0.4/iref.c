@@ -9,14 +9,14 @@
 #pragma save
 #pragma disable_warning 110
 
-void iref_maybe_off(void)
+void iref_maybe_off_IM(void)
 {
 	if (!(STATE(PIN_OUT1) || STATE(PIN_OUT2) || STATE(PIN_OUT3))) {
 		BOARD_IREF_OFF;
 	}
 }
 
-void iref_on(void)
+void iref_on_IM(void)
 {
 	BOARD_IREF_ON;
 }

@@ -27,12 +27,12 @@ static volatile uint16_t rx_cooldown_left = 0; // To avoid half-duplex clash
 static volatile serial_counter_t counts = {0, 0};
 
 // Prototypes
-static void end_of_frame(void);
+static void end_of_frame_IM(void);
 static void may_send(buflen_t len);
-static void transmit_now(void);
+static void transmit_now_IM(void);
 
 // Called from timer interrupt handler when we're between frames.
-static void end_of_frame(void)
+static void end_of_frame_IM(void)
 {
 	bool const locked = rx_front != NULL;
 	if (locked) {
@@ -72,7 +72,7 @@ void pull_serial_counters(serial_counter_t *const copy) __critical
 	memset(&counts, 0, sizeof(counts));
 }
 
-void serial_init(void)
+void serial_init_IM(void)
 {
 	// UART configuration
 	UART1_CR2 =
@@ -145,25 +145,25 @@ static void may_send(buflen_t len) __critical
 	tx_state = true;
 
 	// RS-485 is half duplex. We need to wait until rx line
-	// becomes idle. If it's not, serial_tick calls transmit_now()
-	// later.
+	// becomes idle. If it's not, serial_tick calls
+	// transmit_now_IM() later.
 	if (!rx_cooldown_left) {
-		transmit_now();
+		transmit_now_IM();
 	}
 }
 
-void serial_tick(void) {
+void serial_tick_IM(void) {
 	if (!rx_cooldown_left) {
 		// Timer has already reached zero
 		return;
 	}
 	if (!--rx_cooldown_left && tx_state) {
 		// Timer reached zero and we have something to send.
-		transmit_now();
+		transmit_now_IM();
 	}
 }
 
-static void transmit_now(void)
+static void transmit_now_IM(void)
 {
 	// Enable RS-485
 	HIGH(PIN_TX_EN);
@@ -182,7 +182,7 @@ void serial_int_uart_rx(void) __interrupt(UART1_RX)
 	if (sr & UART_SR_FE) {
 		// BREAK signal or garbage.
 		rx_front->state = BREAK;
-		end_of_frame();
+		end_of_frame_IM();
 
 		HIGH(PIN_OUT3);
 	} else if (sr & UART_SR_RXNE) {
@@ -190,7 +190,7 @@ void serial_int_uart_rx(void) __interrupt(UART1_RX)
 		LOW(PIN_OUT3);
 
 		// Keep CPU running until we've received a whole message
-		timers_stay_awake(SERIAL_KEEPALIVE_MS);
+		timers_stay_awake_IM(SERIAL_KEEPALIVE_MS);
 
 		// Resetting rx timers
 		rx_cooldown_left = MODBUS_SILENCE;
@@ -200,7 +200,7 @@ void serial_int_uart_rx(void) __interrupt(UART1_RX)
 		if (rx_back->state == OVERFLOW) {
 			// Overflow has already happened earlier.
 			if (chr == '\n') {
-				end_of_frame();
+				end_of_frame_IM();
 			}
 		} else if (chr == '\n') {
 			// End of line
@@ -209,7 +209,7 @@ void serial_int_uart_rx(void) __interrupt(UART1_RX)
 				*rx_p = '\0';
 			}
 			rx_back->state = TEXT; // FIXME detect text properly
-			end_of_frame();
+			end_of_frame_IM();
 		} else if (full) {
 			// Overflow happens now but is not line terminator
 			rx_back->state = OVERFLOW;
