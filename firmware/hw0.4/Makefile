@@ -41,6 +41,6 @@ clean:
 	rm -f $(PROGRAM).ihx $(PROGRAM).cdb $(PROGRAM).lk $(PROGRAM).map $(CCOMPILEDFILES)
 
 flash: $(PROGRAM).ihx
-	stm8flash -c $(PROGRAMMER) -p $(DEVICE) -w $(PROGRAM).ihx
+	stm8flash -c $(PROGRAMMER) -p $(DEVICE) -v $(PROGRAM).ihx || stm8flash -c $(PROGRAMMER) -p $(DEVICE) -w $(PROGRAM).ihx
 	stm8flash -c $(PROGRAMMER) -p $(DEVICE) -v $(PROGRAM).ihx
 	stm8flash -c $(PROGRAMMER) -p $(DEVICE) -R
