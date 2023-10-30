@@ -24,6 +24,7 @@ static void controlled_halt(void);
 static void update_outputs_IM(bool const panic);
 static void debounce_arm_IM(void);
 static bool debounce_tick_IM(void);
+static void setup_IM(void);
 static void loop(void);
 
 // Halts CPU. This must be called outside of interrupt handlers but
@@ -156,6 +157,39 @@ void run_every_1ms(void) __interrupt(TIM2_OVR_UIF_IRQ)
 
 int main(void)
 {
+	// Configure device and enable interrupts.
+	setup_IM();
+	rim();
+
+	// Stay in light sleep to keep timers going. If nothing to
+	// run, go to halt mode.
+	while (true) {
+		loop();
+
+		// Block interrupts while whe figure out sleep method.
+		sim();
+
+		// If there are still messages to process, go to loop.
+		if (serial_has_message_IM()) {
+			rim();
+			continue;
+		}
+#ifdef HALT_ENABLED
+		if (!timers_running && !serial_is_transmitting()) {
+			controlled_halt();
+		} else {
+			wfi();
+		}
+#else
+		wfi();
+#endif
+		// Both controlled_halt() and wfi() implicitly enable
+		// interrupts.
+	}
+}
+
+static void setup_IM(void)
+{
 	// Setting clock speed
 	stm8_configure_clock();
 
@@ -213,36 +247,6 @@ int main(void)
 	TIM2_CR1 = TIM_CR1_CEN;
 
 	serial_init_IM();
-
-	// Enabling interrupts should be the last part of
-	// initialization.
-	rim();
-
-	// Stay in light sleep to keep timers going. If nothing to
-	// run, go to halt mode.
-	while (true) {
-		loop();
-
-		// Block interrupts while whe figure out sleep method.
-		sim();
-
-		// If there are still messages to process, go to loop.
-		if (serial_has_message_IM()) {
-			rim();
-			continue;
-		}
-#ifdef HALT_ENABLED
-		if (!timers_running && !serial_is_transmitting()) {
-			controlled_halt();
-		} else {
-			wfi();
-		}
-#else
-		wfi();
-#endif
-		// Both controlled_halt() and wfi() implicitly enables
-		// interrupts.
-	}
 }
 
 // Run after waking up from the interrupts. Can be used to
