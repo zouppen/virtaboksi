@@ -11,11 +11,11 @@
 
 // On bootup, have a small pause after bootup before switching loads,
 // to avoid oscillation in case of a boot loop.
-static volatile uint16_t ctrl_debounce = STARTUP_DEBOUNCE_MS;
+static uint16_t ctrl_debounce = STARTUP_DEBOUNCE_MS;
 
 // In case excessive flipflopping, turn all outputs off since it might
 // be an indicator of a hardware error.
-static volatile uint16_t ctrl_panic = PANIC_OFF_MS;
+static uint16_t ctrl_panic = PANIC_OFF_MS;
 
 // A global flag for carrying state from ISR to main loop
 static volatile bool timers_running = true;
