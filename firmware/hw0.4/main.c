@@ -26,12 +26,10 @@ static void debounce_arm_IM(void);
 static bool debounce_tick_IM(void);
 static bool loop(void);
 
-// Halts CPU. This must be called outside of interrupt handlers.
+// Halts CPU. This must be called outside of interrupt handlers but
+// interrupts disabled. Like wfi(), enables interrupts on return.
 static void controlled_halt(void)
 {
-	// Must not go to interrupts while preparing halt()
-	sim();
-
 	// "Unreal mode" for serial traffic. Enable interrupt for the
 	// serial pin and it magically wakes up after serial activity,
 	// although this shouldn't be possible according to STM8S data
@@ -225,6 +223,9 @@ int main(void)
 	while (true) {
 		while (loop());
 
+		// Block interrupts while whe figure out sleep method.
+		sim();
+
 #ifdef HALT_ENABLED
 		if (!timers_running && !serial_is_transmitting()) {
 			controlled_halt();
@@ -234,6 +235,8 @@ int main(void)
 #else
 		wfi();
 #endif
+		// Both controlled_halt() and wfi() implicitly enables
+		// interrupts.
 	}
 }
 
