@@ -2,7 +2,7 @@
 DEVICE=stm8s003?3
 
 ## A directory for common include files
-COMMONDIR = ..
+COMMONDIR = ../stm8-lib
 
 ## Get program name from enclosing directory name
 PROGRAM = $(lastword $(subst /, ,$(CURDIR)))
