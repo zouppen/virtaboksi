@@ -79,7 +79,7 @@ void serial_tx_line(void);
 void serial_tx_bin(buflen_t const len);
 
 // Get serial counters and zero them.
-void pull_serial_counters(serial_counter_t *copy);
+void serial_pull_counters(serial_counter_t *copy);
 
 // UART interrupts
 void serial_int_uart_rx(void) __interrupt(UART1_RXC_ISR);

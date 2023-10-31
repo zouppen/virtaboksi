@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stm8.h>
-#include <string.h>
 #include "board.h"
 #include "serial.h"
 #include "timers.h"
@@ -66,10 +65,11 @@ void serial_free_message(void) __critical
 	rx_front = NULL;
 }
 
-void pull_serial_counters(serial_counter_t *const copy) __critical
+void serial_pull_counters(serial_counter_t *const copy) __critical
 {
-	memcpy(copy, &counts, sizeof(counts));
-	memset(&counts, 0, sizeof(counts));
+	*copy = counts;
+	counts.flip_timeout = 0;
+	counts.too_long_tx = 0;
 }
 
 void serial_init_IM(void)
