@@ -415,12 +415,12 @@ void stm8_eeprom_lock(void);
 #define ADC_CR2_SCAN _BV(1)
 
 /* Interrupt commands */
-#define rim()                 {__asm__("rim\n");}  /* enable interrupts */
-#define sim()                 {__asm__("sim\n");}  /* disable interrupts */
-#define nop()                 {__asm__("nop\n");}  /* No Operation */
-#define trap()                {__asm__("trap\n");} /* Trap (soft IT) */
-#define wfi()                 {__asm__("wfi\n");}  /* Wait For Interrupt */
-#define halt()                {__asm__("halt\n");} /* Halt */
+#define enable_interrupts()   __asm__("rim")
+#define disable_interrupts()  __asm__("sim")
+#define nop()                 __asm__("nop")  /* No Operation */
+#define trap()                __asm__("trap") /* Trap (soft IT) */
+#define wfi()                 __asm__("wfi")  /* Wait For Interrupt */
+#define halt()                __asm__("halt") /* Halt */
 
 /* Interrupts */
 #define TLI_ISR                 0

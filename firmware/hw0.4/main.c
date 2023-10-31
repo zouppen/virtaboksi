@@ -159,7 +159,7 @@ int main(void)
 {
 	// Configure device and enable interrupts.
 	setup_IM();
-	rim();
+	enable_interrupts();
 
 	// Stay in light sleep to keep timers going. If nothing to
 	// run, go to halt mode.
@@ -167,11 +167,11 @@ int main(void)
 		loop();
 
 		// Block interrupts while whe figure out sleep method.
-		sim();
+		disable_interrupts();
 
 		// If there are still messages to process, go to loop.
 		if (serial_has_message_IM()) {
-			rim();
+			enable_interrupts();
 			continue;
 		}
 #ifdef HALT_ENABLED
