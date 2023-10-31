@@ -65,42 +65,77 @@ void stm8_eeprom_lock(void);
 #define CLK_SWR         _SFR_(0x50C4)
 #define CLK_SWCR        _SFR_(0x50C5)
 
-/* GPIO */
-#define PA_ODR _SFR_(0x5000)
-#define PA_IDR _SFR_(0x5001)
-#define PA_DDR _SFR_(0x5002)
-#define PA_CR1 _SFR_(0x5003)
-#define PA_CR2 _SFR_(0x5004)
+/* PORT A */
+#define PA_BASE_ADDRESS         0x5000
+#define PA_ODR                  _SFR_(PA_BASE_ADDRESS + 0x00)
+#define PA_IDR                  _SFR_(PA_BASE_ADDRESS + 0x01)
+#define PA_DDR                  _SFR_(PA_BASE_ADDRESS + 0x02)
+#define PA_CR1                  _SFR_(PA_BASE_ADDRESS + 0x03)
+#define PA_CR2                  _SFR_(PA_BASE_ADDRESS + 0x04)
 
-#define PB_ODR _SFR_(0x5005)
-#define PB_IDR _SFR_(0x5006)
-#define PB_DDR _SFR_(0x5007)
-#define PB_CR1 _SFR_(0x5008)
-#define PB_CR2 _SFR_(0x5009)
+/* PORT B */
+#define PB_BASE_ADDRESS         0x5005
+#define PB_ODR                  _SFR_(PB_BASE_ADDRESS + 0x00)
+#define PB_IDR                  _SFR_(PB_BASE_ADDRESS + 0x01)
+#define PB_DDR                  _SFR_(PB_BASE_ADDRESS + 0x02)
+#define PB_CR1                  _SFR_(PB_BASE_ADDRESS + 0x03)
+#define PB_CR2                  _SFR_(PB_BASE_ADDRESS + 0x04)
 
-#define PC_ODR _SFR_(0x500A)
-#define PC_IDR _SFR_(0x500B)
-#define PC_DDR _SFR_(0x500C)
-#define PC_CR1 _SFR_(0x500D)
-#define PC_CR2 _SFR_(0x500E)
+/* PORT C */
+#define PC_BASE_ADDRESS         0x500A
+#define PC_ODR                  _SFR_(PC_BASE_ADDRESS + 0x00)
+#define PC_IDR                  _SFR_(PC_BASE_ADDRESS + 0x01)
+#define PC_DDR                  _SFR_(PC_BASE_ADDRESS + 0x02)
+#define PC_CR1                  _SFR_(PC_BASE_ADDRESS + 0x03)
+#define PC_CR2                  _SFR_(PC_BASE_ADDRESS + 0x04)
 
-#define PD_ODR _SFR_(0x500F)
-#define PD_IDR _SFR_(0x5010)
-#define PD_DDR _SFR_(0x5011)
-#define PD_CR1 _SFR_(0x5012)
-#define PD_CR2 _SFR_(0x5013)
+/* PORT D */
+#define PD_BASE_ADDRESS         0x500F
+#define PD_ODR                  _SFR_(PD_BASE_ADDRESS + 0x00)
+#define PD_IDR                  _SFR_(PD_BASE_ADDRESS + 0x01)
+#define PD_DDR                  _SFR_(PD_BASE_ADDRESS + 0x02)
+#define PD_CR1                  _SFR_(PD_BASE_ADDRESS + 0x03)
+#define PD_CR2                  _SFR_(PD_BASE_ADDRESS + 0x04)
 
-#define PE_ODR _SFR_(0x5014)
-#define PE_IDR _SFR_(0x5015)
-#define PE_DDR _SFR_(0x5016)
-#define PE_CR1 _SFR_(0x5017)
-#define PE_CR2 _SFR_(0x5018)
+/* PORT E */
+#define PE_BASE_ADDRESS         0x5014
+#define PE_ODR                  _SFR_(PE_BASE_ADDRESS + 0x00)
+#define PE_IDR                  _SFR_(PE_BASE_ADDRESS + 0x01)
+#define PE_DDR                  _SFR_(PE_BASE_ADDRESS + 0x02)
+#define PE_CR1                  _SFR_(PE_BASE_ADDRESS + 0x03)
+#define PE_CR2                  _SFR_(PE_BASE_ADDRESS + 0x04)
 
-#define PF_ODR _SFR_(0x5019)
-#define PF_IDR _SFR_(0x501A)
-#define PF_DDR _SFR_(0x501B)
-#define PF_CR1 _SFR_(0x501C)
-#define PF_CR2 _SFR_(0x501D)
+/* PORT F */
+#define PF_BASE_ADDRESS         0x5019
+#define PF_ODR                  _SFR_(PF_BASE_ADDRESS + 0x00)
+#define PF_IDR                  _SFR_(PF_BASE_ADDRESS + 0x01)
+#define PF_DDR                  _SFR_(PF_BASE_ADDRESS + 0x02)
+#define PF_CR1                  _SFR_(PF_BASE_ADDRESS + 0x03)
+#define PF_CR2                  _SFR_(PF_BASE_ADDRESS + 0x04)
+
+/* PORT G */
+#define PG_BASE_ADDRESS         0x501E
+#define PG_ODR                  _SFR_(PG_BASE_ADDRESS + 0x00)
+#define PG_IDR                  _SFR_(PG_BASE_ADDRESS + 0x01)
+#define PG_DDR                  _SFR_(PG_BASE_ADDRESS + 0x02)
+#define PG_CR1                  _SFR_(PG_BASE_ADDRESS + 0x03)
+#define PG_CR2                  _SFR_(PG_BASE_ADDRESS + 0x04)
+
+/* PORT H */
+#define PH_BASE_ADDRESS         0x5023
+#define PH_ODR                  _SFR_(PH_BASE_ADDRESS + 0x00)
+#define PH_IDR                  _SFR_(PH_BASE_ADDRESS + 0x01)
+#define PH_DDR                  _SFR_(PH_BASE_ADDRESS + 0x02)
+#define PH_CR1                  _SFR_(PH_BASE_ADDRESS + 0x03)
+#define PH_CR2                  _SFR_(PH_BASE_ADDRESS + 0x04)
+
+/* PORT I */
+#define PI_BASE_ADDRESS         0x5028
+#define PI_ODR                  _SFR_(PI_BASE_ADDRESS + 0x00)
+#define PI_IDR                  _SFR_(PI_BASE_ADDRESS + 0x01)
+#define PI_DDR                  _SFR_(PI_BASE_ADDRESS + 0x02)
+#define PI_CR1                  _SFR_(PI_BASE_ADDRESS + 0x03)
+#define PI_CR2                  _SFR_(PI_BASE_ADDRESS + 0x04)
 
 /* Flash */
 #define FLASH_BASE_ADDRESS      0x505A
@@ -133,6 +168,18 @@ void stm8_eeprom_lock(void);
 #define FLASH_DUKR              _SFR_(FLASH_BASE_ADDRESS + 0x0A)
 #define FLASH_DUKR_KEY1         FLASH_PUKR_KEY2
 #define FLASH_DUKR_KEY2         FLASH_PUKR_KEY1
+
+/* EXTI */
+#define EXTI_BASE_ADDRESS       0x50A0
+#define EXTI_CR1                _SFR_(EXTI_BASE_ADDRESS + 0x00)
+#define EXTI_CR2                _SFR_(EXTI_BASE_ADDRESS + 0x01)
+
+#define EXTI_CR1_PAIS_EDGES  0b00000011
+#define EXTI_CR1_PBIS_EDGES  0b00001100
+#define EXTI_CR1_PCIS_EDGES  0b00110000
+#define EXTI_CR1_PDIS_EDGES  0b11000000
+#define EXTI_CR2_PEIS_EDGES  0b00000011
+#define EXTI_CR2_TLIS_RISING 0b00000100
 
 /* UART */
 #define UART1_SR _SFR_(0x5230)
@@ -366,14 +413,6 @@ void stm8_eeprom_lock(void);
 #define ADC_CR2_EXTSEL _BV(4)
 #define ADC_CR2_ALIGN _BV(3)
 #define ADC_CR2_SCAN _BV(1)
-
-#define EXTI_CR1 _SFR_(0x50A0)
-#define EXTI_CR2 _SFR_(0x50A1)
-
-#define EXTI_CR1_A_BOTH 0b00000011
-#define EXTI_CR1_B_BOTH 0b00001100
-#define EXTI_CR1_C_BOTH 0b00110000
-#define EXTI_CR1_D_BOTH 0b11000000
 
 /* Interrupt commands */
 #define rim()                 {__asm__("rim\n");}  /* enable interrupts */
