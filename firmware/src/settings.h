@@ -7,6 +7,7 @@
 
 typedef struct {
 	char initialized;
+	uint32_t baud_rate;
 } settings_t;
 
 // Enable EEPROM writes and initialize settings to default values if

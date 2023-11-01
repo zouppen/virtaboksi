@@ -39,7 +39,7 @@ typedef struct {
 extern char serial_tx[SERIAL_TX_LEN];
 
 // Initialize serial port.
-void serial_init_IM(void);
+void serial_init(uint32_t baud);
 
 // Is serial transmitter on?
 bool serial_is_transmitting(void);

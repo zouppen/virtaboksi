@@ -248,7 +248,7 @@ static void setup_IM(void)
 	// Control Register 1, Counter ENable bit (CEN)
 	TIM2_CR1 = TIM_CR1_CEN;
 
-	serial_init_IM();
+	serial_init(settings.baud_rate);
 }
 
 // Run after waking up from the interrupts. Can be used to
