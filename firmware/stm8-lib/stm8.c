@@ -1,5 +1,5 @@
-#include <stm8.h>
 #include <stdbool.h>
+#include "stm8.h"
 
 bool stm8_uart1_baudrate(uint16_t rate)
 {

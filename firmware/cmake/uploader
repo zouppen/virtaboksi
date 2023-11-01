@@ -1,0 +1,9 @@
+#!/bin/sh -eu
+
+if ! stm8flash -c "$PROGRAMMER" -p "$DEVICE" -v "$1" 2>/dev/null; then
+    stm8flash -c "$PROGRAMMER" -p "$DEVICE" -w "$1"
+    stm8flash -c "$PROGRAMMER" -p "$DEVICE" -v "$1"
+else
+    echo "This firmware is already uploaded to the hardware."
+fi
+stm8flash -c "$PROGRAMMER" -p "$DEVICE" -R

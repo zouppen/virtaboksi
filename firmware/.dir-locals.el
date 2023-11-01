@@ -3,5 +3,5 @@
 
 ((c-mode
   (c-file-style . "linux")
-  (compile-command . "make")
+  (compile-command . "make -C ../build")
 ))
