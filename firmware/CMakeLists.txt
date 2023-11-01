@@ -26,7 +26,7 @@ set(TICKS_PER_SEC 1000)
 # bits and after another 14 bits we can start transmitting.
 # https://en.wikipedia.org/wiki/Modbus#Modbus_RTU_frame_format_(primarily_used_on_asynchronous_serial_data_lines_like_RS-485/EIA-485)
 # This trick does rounding towards higher integer
-math(EXPR MODBUS_SILENCE "(14 * ${TICKS_PER_SEC} + ${BAUD} - 1) / ${BAUD}" OUTPUT_FORMAT DECIMAL)
+math(EXPR MODBUS_SILENCE "(14 * ${TICKS_PER_SEC} - 1) / ${BAUD} + 1" OUTPUT_FORMAT DECIMAL)
 
 # The programmer to use, see stm8flash -c allowed values
 set(PROGRAMMER stlinkv2 CACHE STRING "Programmer type in stm8flash")
