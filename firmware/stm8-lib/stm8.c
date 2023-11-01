@@ -19,8 +19,14 @@ bool stm8_uart1_baudrate(uint16_t rate)
 
 void stm8_configure_clock(void)
 {
-#if F_CPU == 2000000
-	// Not changing clock speed, running on default of 2 MHz
+#if   F_CPU == 16000000
+	CLK_CKDIVR = 0b00 << 3;
+#elif F_CPU ==  8000000
+	CLK_CKDIVR = 0b01 << 3;
+#elif F_CPU ==  4000000
+	CLK_CKDIVR = 0b10 << 3;
+#elif F_CPU ==  2000000
+	// Default is 0b11 << 3;
 #else
 #error No support for this CPU frequency. FIXME by editing stm8.c
 #endif

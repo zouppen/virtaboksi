@@ -235,9 +235,8 @@ static void setup_IM(void)
 	// Make interrupts trigger on both edges
 	EXTI_CR1 = 0xff;
 
-	// Timer configuration
-	// Prescaler register: 2MHz/2^4 = 125 kHz
-	TIM2_PSCR = 4;
+	// Timer prescale to 125 kHz
+	TIM2_PSCR = TICK_PRESCALE;
 	// Counter Auto-Reload Registers. TIM2_ARR = 125, 1 millisecond
 	TIM2_ARRH = 0;
 	TIM2_ARRL = 125;

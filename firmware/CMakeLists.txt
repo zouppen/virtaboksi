@@ -12,6 +12,7 @@ set(DEVICE stm8s003?3 CACHE STRING "STM8 variant")
 
 # RC oscillator frequency. This should be one of the supported values in your MCU.
 set(F_CPU 2000000 CACHE STRING "CPU clock speed")
+set_property(CACHE F_CPU PROPERTY STRINGS 2000000 4000000 8000000 16000000)
 
 # Default Baudrate for UART
 set(BAUD 9600 CACHE STRING "Serial port baud rate")
