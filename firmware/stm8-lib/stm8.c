@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include "stm8.h"
 
-bool stm8_uart1_baudrate(uint16_t rate)
+bool stm8_uart1_baudrate(uint32_t rate)
 {
 	// Divide cpu freq with baud rate, rounding to nearest.
 	uint32_t const freq = F_CPU;

@@ -12,7 +12,7 @@ void stm8_configure_clock(void);
 
 // Set UART1 baud rate based on F_CPU. Returns false in case of an
 // invalid value.
-bool stm8_uart1_baudrate(uint16_t rate);
+bool stm8_uart1_baudrate(uint32_t rate);
 
 // Make EEPROM read-write
 void stm8_eeprom_unlock(void);
