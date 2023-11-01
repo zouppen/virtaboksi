@@ -7,8 +7,9 @@ project(virtaboksi C ASM)
 # Product filename
 set(PRODUCT_NAME virtaboksi)
 
-# Set STM8 device type
-set(DEVICE stm8s003?3 CACHE STRING "STM8 variant")
+# Hardware versions
+set(BOARD_VERSION 0.5 CACHE STRING "Hardware version")
+set_property(CACHE BOARD_VERSION PROPERTY STRINGS 0.4 0.5)
 
 # RC oscillator frequency. This should be one of the supported values in your MCU.
 set(F_CPU_MHZ 2 CACHE STRING "CPU clock speed")
@@ -31,10 +32,20 @@ math(EXPR MODBUS_SILENCE "(14 * ${F_CPU} + ${MODBUS_SILENCE_DIV} - 1) / ${MODBUS
 # The programmer to use, see stm8flash -c allowed values
 set(PROGRAMMER stlinkv2 CACHE STRING "Programmer type in stm8flash")
 
+# Set some variables based on hardware version
+if(BOARD_VERSION STREQUAL "0.4")
+  set(DEVICE stm8s003?3)
+  add_definitions(-DBOARD_0_4)
+elseif(BOARD_VERSION STREQUAL "0.5")
+  set(DEVICE stm8s003?3)
+  add_definitions(-DBOARD_0_5)
+else()
+  message(SEND_ERROR "Unsupported board version")
+endif()
+
 # Pass defines to compiler
 add_definitions(
   -DF_CPU=${F_CPU}UL
-  -DBOARD_0_5
   -DBAUD=${BAUD}
   -DMODBUS_SILENCE=${MODBUS_SILENCE}
 )
