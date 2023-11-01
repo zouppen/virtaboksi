@@ -4,6 +4,7 @@
 #include "board.h"
 #include "serial.h"
 #include "timers.h"
+#include "settings.h"
 
 #define NUL_TERMINATED 0
 
@@ -72,7 +73,7 @@ void serial_pull_counters(serial_counter_t *const copy) __critical
 	counts.too_long_tx = 0;
 }
 
-void serial_init(uint32_t baud)
+void serial_init(void)
 {
 	// UART configuration
 	UART1_CR2 =
@@ -80,7 +81,7 @@ void serial_init(uint32_t baud)
 		UART_CR2_REN |   // Receiver enable
 		UART_CR2_RIEN;   // Receiver interrupt enabled
 	// UART1_CR3 default is 1 stop bit
-	stm8_uart1_baudrate(baud);
+	stm8_uart1_baudrate(settings.baud_rate);
 
 	// Turn on rs485 rx and put to receive mode
 	OUTPUT(PIN_TX_EN);
