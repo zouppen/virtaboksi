@@ -97,6 +97,21 @@ Status: 🔬 **Hardware OK**
 RS-485 hardware is tested and some firmware tests performed, but no
 Modbus implementation exists yet.
 
+## Building firmware
+
+To build firmware, you need CMake and sdcc. The preparations are very
+standard CMake stuff. In `firmware` subdirectory, run:
+
+```sh
+mkdir build
+cd build
+cmake ..
+```
+
+And then, `make` compiles it. Alternatively, `make upload` to compile
+and flash.
+
+
 ## License
 
 The firmware is free software: you can redistribute it and/or modify
