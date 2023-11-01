@@ -31,6 +31,12 @@ math(EXPR MODBUS_SILENCE "(14 * ${TICKS_PER_SEC} + ${BAUD} - 1) / ${BAUD}" OUTPU
 # The programmer to use, see stm8flash -c allowed values
 set(PROGRAMMER stlinkv2 CACHE STRING "Programmer type in stm8flash")
 
+# Report what we are going to do
+message(STATUS "Board version: ${BOARD_VERSION}")
+message(STATUS "CPU frequency: ${F_CPU_MHZ} MHz")
+message(STATUS "Default baud rate: ${BAUD} bps")
+message(STATUS "Modbus silence: ${MODBUS_SILENCE} ticks")
+
 # Set some variables based on hardware version
 if(BOARD_VERSION STREQUAL "0.4")
   set(DEVICE stm8s003?3)
