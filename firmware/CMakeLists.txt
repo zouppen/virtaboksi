@@ -21,13 +21,6 @@ set(BAUD 9600 CACHE STRING "Serial port baud rate")
 
 set(TICKS_PER_SEC 1000)
 
-# MODBUS_SILENCE is the 14 bit long duration on the serial line,
-# measured in ticks. We consider a frame to be ready after 14
-# bits and after another 14 bits we can start transmitting.
-# https://en.wikipedia.org/wiki/Modbus#Modbus_RTU_frame_format_(primarily_used_on_asynchronous_serial_data_lines_like_RS-485/EIA-485)
-# This trick does rounding towards higher integer
-math(EXPR MODBUS_SILENCE "(14 * ${TICKS_PER_SEC} - 1) / ${BAUD} + 1" OUTPUT_FORMAT DECIMAL)
-
 # The programmer to use, see stm8flash -c allowed values
 set(PROGRAMMER stlinkv2 CACHE STRING "Programmer type in stm8flash")
 
@@ -35,7 +28,6 @@ set(PROGRAMMER stlinkv2 CACHE STRING "Programmer type in stm8flash")
 message(STATUS "Board version: ${BOARD_VERSION}")
 message(STATUS "CPU frequency: ${F_CPU_MHZ} MHz")
 message(STATUS "Default baud rate: ${BAUD} bps")
-message(STATUS "Modbus silence: ${MODBUS_SILENCE} ticks")
 
 # Set some variables based on hardware version
 if(BOARD_VERSION STREQUAL "0.4")
@@ -52,7 +44,6 @@ endif()
 add_definitions(
   -DF_CPU=${F_CPU}UL
   -DBAUD=${BAUD}
-  -DMODBUS_SILENCE=${MODBUS_SILENCE}
 )
 
 add_compile_options(

@@ -30,6 +30,7 @@ static volatile serial_counter_t counts = {0, 0};
 static void end_of_frame_IM(void);
 static void may_send(buflen_t len);
 static void transmit_now_IM(void);
+static uint16_t get_modbus_silence(void);
 
 // Called from timer interrupt handler when we're between frames.
 static void end_of_frame_IM(void)
@@ -178,6 +179,16 @@ static void transmit_now_IM(void)
 	UART1_CR2 |= UART_CR2_TIEN;
 }
 
+// get_modbus_silence() returns the 14 bit long duration on the serial
+// line, measured in ticks. We consider a frame to be ready after 14
+// bits and after another 14 bits we can start transmitting.
+// https://en.wikipedia.org/wiki/Modbus#Modbus_RTU_frame_format_(primarily_used_on_asynchronous_serial_data_lines_like_RS-485/EIA-485)
+static uint16_t get_modbus_silence(void)
+{
+	uint16_t const ticks_per_sec = 1000;
+	return (14 * ticks_per_sec - 1) / settings.baud_rate + 1;
+}
+
 void serial_int_uart_rx(void) __interrupt(UART1_RXC_ISR)
 {
 	// Cache values to avoid the register getting cleared. This
@@ -199,7 +210,7 @@ void serial_int_uart_rx(void) __interrupt(UART1_RXC_ISR)
 		timers_stay_awake_IM(SERIAL_KEEPALIVE_MS);
 
 		// Resetting rx timers
-		rx_cooldown_left = MODBUS_SILENCE;
+		rx_cooldown_left = get_modbus_silence();
 
 		bool const full = rx_p == rx_back->data + SERIAL_RX_LEN;
 
