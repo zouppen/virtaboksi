@@ -6,6 +6,7 @@
 #include "util.h"
 #include "serial.h"
 #include "timers.h"
+#include "settings.h"
 
 #define HALT_ENABLED
 
@@ -192,6 +193,8 @@ static void setup_IM(void)
 {
 	// Setting clock speed
 	stm8_configure_clock();
+
+	settings_init();
 
 	// As suggested in chapter 11.5 of RM0016, unused pins are set
 	// to pull-up state. We make them all pull-up first, it's safe.
