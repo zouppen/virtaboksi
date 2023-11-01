@@ -7,16 +7,6 @@
 
 typedef uint8_t buflen_t;
 
-// FIXME Move these to CMake config!
-
-#define BAUD 9600
-
-// MODBUS_SILENCE is the 14 bit long duration on the serial line,
-// measured in TIMER2 ticks. We consider a frame to be ready after 14
-// bits and after another 14 bits we can start transmitting.
-// https://en.wikipedia.org/wiki/Modbus#Modbus_RTU_frame_format_(primarily_used_on_asynchronous_serial_data_lines_like_RS-485/EIA-485)
-#define MODBUS_SILENCE 3
-
 // Serial buffer lengths. If you want to go beyond 255, remember to
 // change buflen_t from uint8_t to uint16_t.
 #define SERIAL_RX_LEN 80

@@ -13,6 +13,19 @@ set(DEVICE stm8s003?3 CACHE STRING "STM8 variant")
 # RC oscillator frequency. This should be one of the supported values in your MCU.
 set(F_CPU 2000000 CACHE STRING "CPU clock speed")
 
+# Default Baudrate for UART
+set(BAUD 9600 CACHE STRING "Serial port baud rate")
+
+set(CLOCK_PRESCALER 1000)
+
+# MODBUS_SILENCE is the 14 bit long duration on the serial line,
+# measured in ticks. We consider a frame to be ready after 14
+# bits and after another 14 bits we can start transmitting.
+# https://en.wikipedia.org/wiki/Modbus#Modbus_RTU_frame_format_(primarily_used_on_asynchronous_serial_data_lines_like_RS-485/EIA-485)
+# This trick does rounding towards higher integer
+math(EXPR MODBUS_SILENCE_DIV "${BAUD} * ${CLOCK_PRESCALER}" OUTPUT_FORMAT DECIMAL)
+math(EXPR MODBUS_SILENCE "(14 * ${F_CPU} + ${MODBUS_SILENCE_DIV} - 1) / ${MODBUS_SILENCE_DIV}" OUTPUT_FORMAT DECIMAL)
+
 # The programmer to use, see stm8flash -c allowed values
 set(PROGRAMMER stlinkv2 CACHE STRING "Programmer type in stm8flash")
 
@@ -20,6 +33,8 @@ set(PROGRAMMER stlinkv2 CACHE STRING "Programmer type in stm8flash")
 add_definitions(
   -DF_CPU=${F_CPU}UL
   -DBOARD_0_5
+  -DBAUD=${BAUD}
+  -DMODBUS_SILENCE=${MODBUS_SILENCE}
 )
 
 add_compile_options(
