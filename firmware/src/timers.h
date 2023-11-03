@@ -9,15 +9,15 @@
 #define MINIMUM_WAKEUP_MS 100
 #define SERIAL_KEEPALIVE_MS 1000
 
-// Prescaler register: f/2^x = 125 kHz, e.g. 2MHz/2^4 = 125 kHz
+// Prescaler register: f/2^x = 1 MHz, e.g. 16MHz/2^4 = 1 MHz
 #if   F_CPU == 16000000
-#define TICK_PRESCALE 7
-#elif F_CPU ==  8000000
-#define TICK_PRESCALE 6
-#elif F_CPU ==  4000000
-#define TICK_PRESCALE 5
-#elif F_CPU ==  2000000
 #define TICK_PRESCALE 4
+#elif F_CPU ==  8000000
+#define TICK_PRESCALE 3
+#elif F_CPU ==  4000000
+#define TICK_PRESCALE 2
+#elif F_CPU ==  2000000
+#define TICK_PRESCALE 1
 #else
 #error No support for this CPU frequency. FIXME by editing timers.h
 #endif

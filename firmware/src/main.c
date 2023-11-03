@@ -240,9 +240,9 @@ static void setup_IM(void)
 
 	// Timer prescale to 125 kHz
 	TIM2_PSCR = TICK_PRESCALE;
-	// Counter Auto-Reload Registers. TIM2_ARR = 125, 1 millisecond
-	TIM2_ARRH = 0;
-	TIM2_ARRL = 125;
+	// Counter Auto-Reload Registers, the main tick timer
+	TIM2_ARRH = TICK_USEC >> 8;
+	TIM2_ARRL = TICK_USEC & 0xff;
 	// Interrupt Enable Register, Update interrupt (UIE)
 	TIM2_IER = TIM_IER_UIE;
 	// Control Register 1, Counter ENable bit (CEN)

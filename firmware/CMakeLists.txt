@@ -19,7 +19,8 @@ math(EXPR F_CPU "${F_CPU_MHZ} * 1000000" OUTPUT_FORMAT DECIMAL)
 # Default Baudrate for UART
 set(BAUD 9600 CACHE STRING "Serial port baud rate")
 
-set(TICKS_PER_SEC 1000)
+# Tick granularity. Too low means more interrupts.
+set(TICK_USEC 1000 CACHE STRING "Tick duration in µs")
 
 # The programmer to use, see stm8flash -c allowed values
 set(PROGRAMMER stlinkv2 CACHE STRING "Programmer type in stm8flash")
@@ -44,6 +45,7 @@ endif()
 add_definitions(
   -DF_CPU=${F_CPU}UL
   -DBAUD=${BAUD}
+  -DTICK_USEC=${TICK_USEC}
 )
 
 add_compile_options(
