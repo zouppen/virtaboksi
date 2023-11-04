@@ -93,7 +93,7 @@ void serial_init(void)
 	// measured in ticks. We consider a frame to be ready after 14
 	// bits and after another 14 bits we can start transmitting.
 	// https://en.wikipedia.org/wiki/Modbus#Modbus_RTU_frame_format_(primarily_used_on_asynchronous_serial_data_lines_like_RS-485/EIA-485)
-	uint16_t const ticks_per_sec = 1000;
+	uint16_t const ticks_per_sec = 1000000UL / TICK_USEC;
 	modbus_silence = (14 * ticks_per_sec - 1) / settings.baud_rate + 1;
 }
 
@@ -205,7 +205,7 @@ void serial_int_uart_rx(void) __interrupt(UART1_RXC_ISR)
 		LOW(PIN_OUT3);
 
 		// Keep CPU running until we've received a whole message
-		timers_stay_awake_IM(SERIAL_KEEPALIVE_MS);
+		timers_stay_awake_IM(SERIAL_KEEPALIVE_TICKS);
 
 		// Resetting rx timers
 		rx_cooldown_left = modbus_silence;

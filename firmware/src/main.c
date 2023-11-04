@@ -12,11 +12,11 @@
 
 // On bootup, have a small pause after bootup before switching loads,
 // to avoid oscillation in case of a boot loop.
-static uint16_t ctrl_debounce = STARTUP_DEBOUNCE_MS;
+static uint16_t ctrl_debounce = STARTUP_DEBOUNCE_TICKS;
 
 // In case excessive flipflopping, turn all outputs off since it might
 // be an indicator of a hardware error.
-static uint16_t ctrl_panic = PANIC_OFF_MS;
+static uint16_t ctrl_panic = PANIC_OFF_TICKS;
 
 // A global flag for carrying state from ISR to main loop
 static volatile bool timers_running = true;
@@ -44,7 +44,7 @@ static void controlled_halt(void)
 	// We may wake up because of start bit on UART line, meaning
 	// the first byte hasn't been yet received. Ensuring that
 	// we'll stay awake until the end of first byte at minimum.
-	timers_stay_awake_IM(MINIMUM_WAKEUP_MS);
+	timers_stay_awake_IM(MINIMUM_WAKEUP_TICKS);
 	timers_running = true;
 
 	// Put IREF to powersave if no LEDs are lit
@@ -102,7 +102,7 @@ static void update_outputs_IM(bool const panic)
 
 static void debounce_arm_IM(void)
 {
-	ctrl_debounce = DEBOUNCE_MS;
+	ctrl_debounce = DEBOUNCE_TICKS;
 }
 
 static bool debounce_tick_IM(void)
@@ -117,7 +117,7 @@ static bool debounce_tick_IM(void)
 			return true;
 		}
 		// Reached zero
-		ctrl_panic = PANIC_OFF_MS;
+		ctrl_panic = PANIC_OFF_TICKS;
 		update_outputs_IM(false);
 	}
 	return false;

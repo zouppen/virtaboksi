@@ -17,13 +17,26 @@ set_property(CACHE F_CPU_MHZ PROPERTY STRINGS 2 4 8 16)
 math(EXPR F_CPU "${F_CPU_MHZ} * 1000000" OUTPUT_FORMAT DECIMAL)
 
 # Default Baudrate for UART
-set(BAUD 9600 CACHE STRING "Serial port baud rate")
+set(BAUD 9600 CACHE STRING "Serial port default baud rate")
 
 # Tick granularity. Too low means more interrupts.
 set(TICK_USEC 1000 CACHE STRING "Tick duration in µs")
 
 # The programmer to use, see stm8flash -c allowed values
 set(PROGRAMMER stlinkv2 CACHE STRING "Programmer type in stm8flash")
+
+# Some operational variables which aren't yet run-time configurable
+set(DEBOUNCE_MS 200 CACHE STRING "Debounce duration in ms")
+set(STARTUP_DEBOUNCE_MS 500 CACHE STRING "Startup debounce in ms")
+set(PANIC_OFF_MS 1000 CACHE STRING "Panic off in case of a too long debouning, in ms")
+set(MINIMUM_WAKEUP_MS 100 CACHE STRING "Minimum time to stay awake after a wake-up, in ms")
+set(SERIAL_KEEPALIVE_MS 1000 CACHE STRING "Minimum time to stay awake after serial activity, in ms")
+
+math(EXPR DEBOUNCE_TICKS "${DEBOUNCE_MS} * 1000 / ${TICK_USEC}" OUTPUT_FORMAT DECIMAL)
+math(EXPR STARTUP_DEBOUNCE_TICKS "${STARTUP_DEBOUNCE_MS} * 1000 / ${TICK_USEC}" OUTPUT_FORMAT DECIMAL)
+math(EXPR PANIC_OFF_TICKS "${PANIC_OFF_MS} * 1000 / ${TICK_USEC}" OUTPUT_FORMAT DECIMAL)
+math(EXPR MINIMUM_WAKEUP_TICKS "${MINIMUM_WAKEUP_MS} * 1000 / ${TICK_USEC}" OUTPUT_FORMAT DECIMAL)
+math(EXPR SERIAL_KEEPALIVE_TICKS "${SERIAL_KEEPALIVE_MS} * 1000 / ${TICK_USEC}" OUTPUT_FORMAT DECIMAL)
 
 # Report what we are going to do
 message(STATUS "Board version: ${BOARD_VERSION}")
@@ -44,8 +57,13 @@ endif()
 # Pass defines to compiler
 add_definitions(
   -DF_CPU=${F_CPU}UL
-  -DBAUD=${BAUD}
-  -DTICK_USEC=${TICK_USEC}
+  -DBAUD=${BAUD}UL
+  -DTICK_USEC=${TICK_USEC}U
+  -DDEBOUNCE_TICKS=${DEBOUNCE_TICKS}U
+  -DSTARTUP_DEBOUNCE_TICKS=${STARTUP_DEBOUNCE_TICKS}U
+  -DPANIC_OFF_TICKS=${PANIC_OFF_TICKS}U
+  -DMINIMUM_WAKEUP_TICKS=${MINIMUM_WAKEUP_TICKS}U
+  -DSERIAL_KEEPALIVE_TICKS=${SERIAL_KEEPALIVE_TICKS}U
 )
 
 add_compile_options(
